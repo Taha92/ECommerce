@@ -72,4 +72,7 @@ dependencies {
     // Firebase auth and FireStore
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
+
+    // Coil
+    implementation("io.coil-kt:coil-compose:2.6.0")
 }
