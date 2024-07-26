@@ -5,13 +5,19 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.ecommerce.component.ReaderAppBar
+import com.example.ecommerce.navigation.ShoppingNavigation
 import com.example.ecommerce.ui.theme.ECommerceTheme
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -27,19 +33,16 @@ class MainActivity : ComponentActivity() {
                 product["price"] = "83.3"
                 product["image"] = "https://market-product-images-cdn.getirapi.com/product/2f9dcc14-8eaa-4822-93f8-4d1fa259a8fb.jpg"
 
-
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    db.collection("products")
+                    /*db.collection("products")
                         .add(product)
                         .addOnSuccessListener {
                             Log.d("DB", "onCreate: ${it.id}")
                         }.addOnFailureListener {
                             Log.d("DB", "onCreate: ${it}")
-                        }
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                        }*/
+                    ShoppingApp()
+
                 }
             }
         }
@@ -47,17 +50,22 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+fun ShoppingApp() {
+    Surface(modifier = Modifier
+        .fillMaxSize()
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            ShoppingNavigation()
+        }
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     ECommerceTheme {
-        Greeting("Android")
     }
 }
