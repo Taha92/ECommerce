@@ -20,7 +20,9 @@ import com.example.ecommerce.component.ReaderAppBar
 import com.example.ecommerce.navigation.ShoppingNavigation
 import com.example.ecommerce.ui.theme.ECommerceTheme
 import com.google.firebase.firestore.FirebaseFirestore
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
