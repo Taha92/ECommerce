@@ -47,7 +47,10 @@ import coil.compose.rememberImagePainter
 import com.example.ecommerce.component.ReaderAppBar
 import com.example.ecommerce.model.Product
 import com.example.ecommerce.model.ProductXX
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QueryDocumentSnapshot
+
 
 @Composable
 fun ShoppingHomeScreen(
@@ -211,7 +214,7 @@ private fun MyIconBox(product: ProductXX) {
                     image = product.thumbnailURL,
                     quantity = "1",
                 )
-                saveProductToDatabase(mProduct)
+                performDatabaseOperation(mProduct)
             },
             modifier = Modifier
                 .offset {
@@ -230,11 +233,26 @@ private fun MyIconBox(product: ProductXX) {
     }
 }
 
-fun saveProductToDatabase(product: Product) {
+fun performDatabaseOperation(product: Product) {
 
     val db = FirebaseFirestore.getInstance()
     val dbCollection = db.collection("products")
+    val query = dbCollection.whereEqualTo("name", product.name.toString())
 
+    query.get().addOnSuccessListener { snapshot ->
+        for (document in snapshot) {
+            if (document.exists()) {
+                //Update quantity
+                updateProductInDatabase(dbCollection, document)
+            } else {
+                //Save new item
+                saveProductInDatabase(product, dbCollection)
+            }
+        }
+    }
+}
+
+fun saveProductInDatabase(product: Product, dbCollection: CollectionReference) {
     if (product.toString().isNotEmpty()) {
         dbCollection.add(product)
             .addOnSuccessListener { documentRef ->
@@ -252,5 +270,21 @@ fun saveProductToDatabase(product: Product) {
                     }
             }
     }
+}
 
+fun updateProductInDatabase(
+    dbCollection: CollectionReference,
+    document: QueryDocumentSnapshot
+) {
+    val increment = (document.data["quantity"] as String).toInt() + 1
+    dbCollection.document(document.id)
+        .update(hashMapOf("quantity" to increment.toString()) as Map<String, Any>)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("Success", "SaveToFirebase: Updated Successfully!")
+            }
+        }
+        .addOnFailureListener {
+            Log.d("Error", "SaveToFirebase: Error updating doc")
+        }
 }
