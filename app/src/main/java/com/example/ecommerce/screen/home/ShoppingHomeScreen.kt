@@ -1,5 +1,6 @@
 package com.example.ecommerce.screen.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,21 +33,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.ecommerce.component.ReaderAppBar
+import com.example.ecommerce.model.Product
 import com.example.ecommerce.model.ProductXX
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun ShoppingHomeScreen(
@@ -100,7 +101,7 @@ fun ProductsGridView() {
     Box(modifier = Modifier.padding((iconSize / 2))) {
         Card(
             shape = RoundedCornerShape(29.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = White),
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
             modifier = Modifier
                 .padding(10.dp)
@@ -156,9 +157,8 @@ fun ProductsGridView() {
     }
 }
 
-@Preview
 @Composable
-private fun MyIconBox(product: ProductXX = ProductXX(imageURL = "asfd", name = "ds", price = 0.0)) {
+private fun MyIconBox(product: ProductXX) {
 
     val iconSize = 24.dp
     val offsetInPx = LocalDensity.current.run { (iconSize / 2).roundToPx() }
@@ -167,8 +167,9 @@ private fun MyIconBox(product: ProductXX = ProductXX(imageURL = "asfd", name = "
 
         Card(
             modifier = Modifier
-                .height(152.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+                .height(152.dp)
+                .clickable {},
+            colors = CardDefaults.cardColors(containerColor = White),
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         ) {
             Column(
@@ -202,7 +203,16 @@ private fun MyIconBox(product: ProductXX = ProductXX(imageURL = "asfd", name = "
         }
 
         IconButton(
-            onClick = {},
+            onClick = {
+                //Save product to firestore
+                val mProduct = Product(
+                    name = product.name,
+                    price = product.priceText,
+                    image = product.thumbnailURL,
+                    quantity = "1",
+                )
+                saveProductToDatabase(mProduct)
+            },
             modifier = Modifier
                 .offset {
                     IntOffset(x = +offsetInPx, y = -offsetInPx)
@@ -218,4 +228,29 @@ private fun MyIconBox(product: ProductXX = ProductXX(imageURL = "asfd", name = "
             )
         }
     }
+}
+
+fun saveProductToDatabase(product: Product) {
+
+    val db = FirebaseFirestore.getInstance()
+    val dbCollection = db.collection("products")
+
+    if (product.toString().isNotEmpty()) {
+        dbCollection.add(product)
+            .addOnSuccessListener { documentRef ->
+                val docId = documentRef.id
+                dbCollection.document(docId)
+                    .update(hashMapOf("id" to docId) as Map<String, Any>)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Log.d("Success", "SaveToFirebase: Saved Successfully!")
+                            //navController.popBackStack()
+                        }
+                    }
+                    .addOnFailureListener {
+                        Log.d("Error", "SaveToFirebase: Error updating doc")
+                    }
+            }
+    }
+
 }
