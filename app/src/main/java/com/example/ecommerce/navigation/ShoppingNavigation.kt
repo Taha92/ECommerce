@@ -5,6 +5,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.ecommerce.screen.ShoppingSplashScreen
 import com.example.ecommerce.screen.cart.CartScreenViewModel
 import com.example.ecommerce.screen.cart.ShoppingCartScreen
 import com.example.ecommerce.screen.home.HomeScreenViewModel
@@ -17,8 +18,12 @@ fun ShoppingNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = ShoppingScreens.LoginScreen.name
+        startDestination = ShoppingScreens.ShoppingSplashScreen.name
     ) {
+        composable(ShoppingScreens.ShoppingSplashScreen.name) {
+            ShoppingSplashScreen(navController = navController)
+        }
+
         composable(ShoppingScreens.ShoppingHomeScreen.name) {
             val homeViewModel = hiltViewModel<HomeScreenViewModel>()
             ShoppingHomeScreen(navController = navController, viewModel = homeViewModel)

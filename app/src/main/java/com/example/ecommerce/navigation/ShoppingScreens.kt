@@ -1,7 +1,7 @@
 package com.example.ecommerce.navigation
 
 enum class ShoppingScreens {
-    SplashScreen,
+    ShoppingSplashScreen,
     LoginScreen,
     CreateAccountScreen,
     ShoppingHomeScreen,
@@ -15,7 +15,7 @@ enum class ShoppingScreens {
     companion object {
         fun fromRoute(route: String?): ShoppingScreens
                 = when(route?.substringBefore("/")) {
-            SplashScreen.name -> SplashScreen
+            ShoppingSplashScreen.name -> ShoppingSplashScreen
             LoginScreen.name -> LoginScreen
             CreateAccountScreen.name -> CreateAccountScreen
             ShoppingHomeScreen.name -> ShoppingHomeScreen
