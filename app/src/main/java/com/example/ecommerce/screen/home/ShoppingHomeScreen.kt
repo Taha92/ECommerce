@@ -58,7 +58,10 @@ fun ShoppingHomeScreen(
     viewModel: HomeScreenViewModel = hiltViewModel()
 ) {
     Scaffold(topBar = {
-        ReaderAppBar(title = "Shopping App", navController = navController)
+        ReaderAppBar(
+            title = "Shopping App",
+            navController = navController,
+            viewModel = viewModel)
     }) {
         //content
         Surface(modifier = Modifier
