@@ -84,84 +84,13 @@ fun HomeContent(
         columns = GridCells.Fixed(3)
     ) {
         items(items = listOfProducts) {product ->
-            MyIconBox(product)
-        }
-        /*items(numbers.size) {
-            *//*Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "Number")
-                Text(text = "  $it",)
-            }*//*
-            MyIconBox()
-        }*/
-    }
-}
-
-@Composable
-fun ProductsGridView() {
-    val iconSize = 24.dp
-    val offsetInPx = LocalDensity.current.run { (iconSize/ 2).roundToPx() }
-
-    Box(modifier = Modifier.padding((iconSize / 2))) {
-        Card(
-            shape = RoundedCornerShape(29.dp),
-            colors = CardDefaults.cardColors(containerColor = White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-            modifier = Modifier
-                .padding(10.dp)
-                .height(152.dp)
-                .width(30.dp)
-                .clickable { }
-        ) {
-            Column(
-                modifier = Modifier
-                    .weight(1f),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                    painter = rememberImagePainter(data = "https://market-product-images-cdn.getirapi.com/product/2f9dcc14-8eaa-4822-93f8-4d1fa259a8fb.jpg"),
-                    contentDescription = "Product image",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp)
-                        .padding(end = 4.dp),
-                    contentScale = ContentScale.Fit
-                )
-
-                Text(text = "₺83.3")
-                Text(
-                    text = "Lipton Ice Tea Peach",
-                    maxLines = 3,
-                    overflow = TextOverflow.Clip,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(4.dp)
-                )
-
-            }
-        }
-
-        IconButton(
-            onClick = {},
-            modifier = Modifier
-                .offset {
-                    IntOffset(x = +offsetInPx, y = -offsetInPx)
-                }
-                .clip(CircleShape)
-                .background(White)
-                .size(iconSize)
-                .align(Alignment.TopEnd)
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Close,
-                contentDescription = "",
-            )
+            ProductsGridView(product)
         }
     }
 }
 
 @Composable
-private fun MyIconBox(product: ProductXX) {
+private fun ProductsGridView(product: ProductXX) {
 
     val iconSize = 24.dp
     val offsetInPx = LocalDensity.current.run { (iconSize / 2).roundToPx() }

@@ -11,8 +11,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,6 +41,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.ecommerce.navigation.ShoppingScreens
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -118,7 +121,7 @@ fun WeatherAppBar(
 fun ReaderAppBar(
     title: String,
     icon: ImageVector? = null,
-    showProfile: Boolean = true,
+    isMainScreen: Boolean = true,
     elevation: Dp = 0.dp,
     navController: NavController,
     onBackArrowClicked: () -> Unit = {}
@@ -173,19 +176,26 @@ fun ReaderAppBar(
         },
         actions = {
             IconButton(onClick = {
-                openDialog.value = true
+                //openDialog.value = true
                 /*FirebaseAuth.getInstance().signOut().run {
                     navController.navigate(ReaderScreens.LoginScreen.name)
                 }*/
+                navController.navigate(ShoppingScreens.ShoppingCartScreen.name)
             }) {
-                if (showProfile) Row {
+                if (isMainScreen) Row {
                     Icon(
-                        imageVector = Icons.Rounded.Lock,
-                        contentDescription = "Logout icon"
+                        imageVector = Icons.Rounded.ShoppingCart,
+                        contentDescription = "Logout icon",
+                        tint = Color.Red.copy(alpha = 0.7f),
                     )
                 } else {
-                    Box {
+                    IconButton(onClick = {
 
+                    }) {
+                        Icon(
+                            imageVector = Icons.Rounded.Delete,
+                            contentDescription = "Empty cart icon",
+                        )
                     }
                 }
             }
