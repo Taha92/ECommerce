@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -30,21 +29,19 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.ecommerce.R
-import com.example.ecommerce.component.ReaderAppBar
+import com.example.ecommerce.component.ShoppingAppBar
+import com.example.ecommerce.component.RoundedButton
 import com.example.ecommerce.model.Product
 
 @Composable
@@ -54,7 +51,7 @@ fun ShoppingCartScreen(
 ) {
 
     Scaffold(topBar = {
-        ReaderAppBar(title = "Cart",
+        ShoppingAppBar(title = "Cart",
             icon = Icons.Default.ArrowBack,
             isMainScreen = false,
             navController = navController
@@ -101,46 +98,6 @@ fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun RoundedButton(
-    label: String = "Continue",
-    radius: Int = 29,
-    onPress: () -> Unit = {}
-) {
-    Surface(modifier = Modifier
-        .padding(16.dp)
-            .clip(RoundedCornerShape(
-                bottomEndPercent = radius,
-                bottomStartPercent = radius,
-                topStartPercent = radius,
-                topEndPercent = radius)),
-        color = Color(0xFF92CBDF)
-    ) {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(60.dp)
-            .clickable { onPress.invoke() },
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = label,
-                style = TextStyle(
-                    color = Color.White,
-                    fontSize = 15.sp
-                )
-            )
-        }
-    }
-}
-
-@Composable
-fun ContinueButton() {
-
-
 }
 
 @Composable

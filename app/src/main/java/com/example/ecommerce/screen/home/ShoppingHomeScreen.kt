@@ -13,15 +13,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -35,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,12 +40,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
-import com.example.ecommerce.component.ReaderAppBar
+import com.example.ecommerce.component.ShoppingAppBar
 import com.example.ecommerce.model.Product
 import com.example.ecommerce.model.ProductXX
+import com.example.ecommerce.navigation.ShoppingScreens
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
+import com.google.gson.Gson
 
 
 @Composable
@@ -58,7 +56,7 @@ fun ShoppingHomeScreen(
     viewModel: HomeScreenViewModel = hiltViewModel()
 ) {
     Scaffold(topBar = {
-        ReaderAppBar(
+        ShoppingAppBar(
             title = "Shopping App",
             navController = navController,
             viewModel = viewModel)
@@ -77,23 +75,22 @@ fun ShoppingHomeScreen(
 
 @Composable
 fun HomeContent(
-    navController: NavController = NavController(LocalContext.current),
+    navController: NavController,
     viewModel: HomeScreenViewModel
 ) {
     val listOfProducts = viewModel.list
-    val numbers = (0..20).toList()
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(3)
     ) {
         items(items = listOfProducts) {product ->
-            ProductsGridView(product)
+            ProductsGridView(product, navController)
         }
     }
 }
 
 @Composable
-private fun ProductsGridView(product: ProductXX) {
+private fun ProductsGridView(product: ProductXX, navController: NavController) {
 
     val iconSize = 24.dp
     val offsetInPx = LocalDensity.current.run { (iconSize / 2).roundToPx() }
@@ -103,7 +100,10 @@ private fun ProductsGridView(product: ProductXX) {
         Card(
             modifier = Modifier
                 .height(152.dp)
-                .clickable {},
+                .clickable {
+                    val selectedProductJson = Gson().toJson(product)
+                    navController.navigate(ShoppingScreens.ItemDetailScreen.name + "?selectedProduct=${selectedProductJson}")
+                },
             colors = CardDefaults.cardColors(containerColor = White),
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         ) {

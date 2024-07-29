@@ -1,5 +1,9 @@
 package com.example.ecommerce.model
 
+import kotlinx.serialization.Serializable
+
+
+@Serializable
 data class ProductXX(
     val attribute: String = "",
     val id: String = "",
@@ -9,4 +13,4 @@ data class ProductXX(
     val priceText: String = "",
     val shortDescription: String = "",
     val thumbnailURL: String = ""
-)
+) : java.io.Serializable
