@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.ecommerce.model.ProductXX
 import com.example.ecommerce.screen.ShoppingSplashScreen
+import com.example.ecommerce.screen.card.CardDetailScreen
 import com.example.ecommerce.screen.cart.CartScreenViewModel
 import com.example.ecommerce.screen.cart.ShoppingCartScreen
 import com.example.ecommerce.screen.detail.ItemDetailScreen
@@ -23,7 +24,7 @@ fun ShoppingNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = ShoppingScreens.ShoppingSplashScreen.name
+        startDestination = ShoppingScreens.CardDetailScreen.name
     ) {
         composable(ShoppingScreens.ShoppingSplashScreen.name) {
             ShoppingSplashScreen(navController = navController)
@@ -58,6 +59,10 @@ fun ShoppingNavigation() {
 
         composable(ShoppingScreens.LoginScreen.name) {
             ShoppingLoginScreen(navController = navController)
+        }
+
+        composable(ShoppingScreens.CardDetailScreen.name) {
+            CardDetailScreen(navController = navController)
         }
     }
 }

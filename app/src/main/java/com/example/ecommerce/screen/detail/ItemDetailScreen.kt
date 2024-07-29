@@ -34,7 +34,6 @@ import com.example.ecommerce.component.RoundedButton
 import com.example.ecommerce.component.ShoppingAppBar
 import com.example.ecommerce.model.ProductXX
 
-@Preview
 @Composable
 fun ItemDetailScreen(
     navController: NavController = NavController(LocalContext.current),

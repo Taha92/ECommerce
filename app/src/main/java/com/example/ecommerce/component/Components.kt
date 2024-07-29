@@ -20,6 +20,7 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -255,6 +256,7 @@ fun EmailInput(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputField(
     modifier: Modifier = Modifier,
@@ -264,7 +266,8 @@ fun InputField(
     isSingleLine: Boolean = true,
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Next,
-    onAction: KeyboardActions = KeyboardActions.Default
+    onAction: KeyboardActions = KeyboardActions.Default,
+    readOnly: Boolean = false
 ) {
     OutlinedTextField(
         value = valueState.value,
@@ -282,7 +285,8 @@ fun InputField(
             .fillMaxWidth(),
         enabled = enabled,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
-        keyboardActions = onAction
+        keyboardActions = onAction,
+        readOnly = readOnly
     )
 }
 
@@ -344,10 +348,11 @@ fun RoundedButton(
         .padding(16.dp)
         .clip(
             RoundedCornerShape(
-            bottomEndPercent = radius,
-            bottomStartPercent = radius,
-            topStartPercent = radius,
-            topEndPercent = radius)
+                bottomEndPercent = radius,
+                bottomStartPercent = radius,
+                topStartPercent = radius,
+                topEndPercent = radius
+            )
         ),
         color = Color(0xFF92CBDF)
     ) {
