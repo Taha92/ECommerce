@@ -142,7 +142,9 @@ private fun ProductsGridView(product: ProductXX, navController: NavController) {
                 //Save product to firestore
                 val mProduct = Product(
                     name = product.name,
+                    shortDescription = product.shortDescription,
                     price = product.priceText,
+                    priceWithDecimal = product.price,
                     image = product.thumbnailURL,
                     quantity = "1",
                 )
@@ -172,14 +174,19 @@ fun performDatabaseOperation(product: Product) {
     val query = dbCollection.whereEqualTo("name", product.name.toString())
 
     query.get().addOnSuccessListener { snapshot ->
-        for (document in snapshot) {
-            if (document.exists()) {
-                //Update quantity
-                updateProductInDatabase(dbCollection, document)
-            } else {
-                //Save new item
-                saveProductInDatabase(product, dbCollection)
+        if (snapshot.size() > 0) {
+            for (document in snapshot) {
+                if (document.exists()) {
+                    //Update quantity
+                    updateProductInDatabase(dbCollection, document)
+                } else {
+                    //Save new item
+                    saveProductInDatabase(product, dbCollection)
+                }
             }
+        } else {
+            //Log.e("TAG", "performDatabaseOperation: ", )
+            saveProductInDatabase(product, dbCollection)
         }
     }
 }

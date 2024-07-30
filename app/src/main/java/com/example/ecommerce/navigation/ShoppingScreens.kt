@@ -11,6 +11,7 @@ enum class ShoppingScreens {
     OtpScreen,
     OrderPlacedScreen,
     OrderHistoryScreen,
+    CheckoutScreen,
     ProfileScreen;
 
     companion object {
@@ -26,6 +27,7 @@ enum class ShoppingScreens {
             OtpScreen.name -> OtpScreen
             OrderPlacedScreen.name -> OrderPlacedScreen
             OrderHistoryScreen.name -> OrderHistoryScreen
+            CheckoutScreen.name -> CheckoutScreen
             ProfileScreen.name -> ProfileScreen
             null -> ShoppingHomeScreen
             else -> throw IllegalArgumentException("Route $route is not recognized")

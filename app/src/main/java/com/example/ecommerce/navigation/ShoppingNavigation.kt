@@ -11,6 +11,7 @@ import com.example.ecommerce.model.ProductXX
 import com.example.ecommerce.screen.ShoppingSplashScreen
 import com.example.ecommerce.screen.card.CardDetailScreen
 import com.example.ecommerce.screen.cart.CartScreenViewModel
+import com.example.ecommerce.screen.cart.CheckoutScreen
 import com.example.ecommerce.screen.cart.ShoppingCartScreen
 import com.example.ecommerce.screen.detail.ItemDetailScreen
 import com.example.ecommerce.screen.history.OrderHistoryScreen
@@ -25,7 +26,7 @@ fun ShoppingNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = ShoppingScreens.OrderHistoryScreen.name
+        startDestination = ShoppingScreens.ShoppingSplashScreen.name
     ) {
         composable(ShoppingScreens.ShoppingSplashScreen.name) {
             ShoppingSplashScreen(navController = navController)
@@ -68,6 +69,18 @@ fun ShoppingNavigation() {
 
         composable(ShoppingScreens.OrderHistoryScreen.name) {
             OrderHistoryScreen(navController = navController)
+        }
+
+        val checkoutScreenName = ShoppingScreens.CheckoutScreen.name
+        composable("$checkoutScreenName/{totalPrice}", arguments = listOf(navArgument("totalPrice") {
+            type = NavType.StringType
+        })) { backStackEntry ->
+            backStackEntry.arguments?.getString("totalPrice").let {
+                CheckoutScreen(navController = navController, totalPrice = it.toString())
+            }
+        }
+        composable(ShoppingScreens.CheckoutScreen.name) {
+            CheckoutScreen(navController = navController, totalPrice = it.toString())
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.ecommerce.screen.cart
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -25,7 +26,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.ecommerce.R
@@ -34,7 +34,7 @@ import com.example.ecommerce.component.ShoppingAppBar
 import com.example.ecommerce.navigation.ShoppingScreens
 
 @Composable
-fun CheckoutScreen(navController: NavController) {
+fun CheckoutScreen(navController: NavController, totalPrice: String) {
     Scaffold(topBar = {
         ShoppingAppBar(title = "Checkout",
             icon = Icons.Default.ArrowBack,
@@ -50,14 +50,19 @@ fun CheckoutScreen(navController: NavController) {
             .fillMaxSize()
         ) {
             //checkout content
-            CheckoutContent(navController)
+            CheckoutContent(navController, totalPrice)
         }
     }
 }
 
-@Preview
+@SuppressLint("DefaultLocale")
 @Composable
-fun CheckoutContent(navController: NavController = NavController(LocalContext.current)) {
+fun CheckoutContent(
+    navController: NavController = NavController(LocalContext.current),
+    totalPrice: String
+) {
+    val totalPayable = (totalPrice.toDouble() * 10) / 100
+
     Column(modifier = Modifier
         .fillMaxSize()
     ) {
@@ -113,7 +118,7 @@ fun CheckoutContent(navController: NavController = NavController(LocalContext.cu
                     modifier = Modifier.weight(0.9f)
                 )
                 Text(
-                    text = "₺1200",
+                    text = "₺${totalPrice}",
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
@@ -162,7 +167,7 @@ fun CheckoutContent(navController: NavController = NavController(LocalContext.cu
                     color = Color.Red.copy(alpha = 0.5f)
                 )
                 Text(
-                    text = "₺1180",
+                    text = String.format("₺%.2f", totalPrice.toDouble() - totalPayable),
                     style = MaterialTheme.typography.titleLarge,
                     color = Color.Red.copy(alpha = 0.5f)
                 )
@@ -170,7 +175,9 @@ fun CheckoutContent(navController: NavController = NavController(LocalContext.cu
         }
 
         Box(modifier = Modifier.weight(0.1f)) {
-            RoundedButton(label = "Order and Pay")
+            RoundedButton(label = "Order and Pay") {
+                navController.navigate(ShoppingScreens.CardDetailScreen.name)
+            }
         }
     }
 }

@@ -34,6 +34,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,6 +45,7 @@ import com.example.ecommerce.R
 import com.example.ecommerce.component.ShoppingAppBar
 import com.example.ecommerce.component.RoundedButton
 import com.example.ecommerce.model.Product
+import com.example.ecommerce.navigation.ShoppingScreens
 
 @Composable
 fun ShoppingCartScreen(
@@ -73,7 +76,8 @@ fun ShoppingCartScreen(
 
 @Composable
 fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
-    var listOfProducts= emptyList<Product>()
+    val listOfProducts: List<Product>
+    var totalPrice = 0.0
     //val currentUser = FirebaseAuth.getInstance().currentUser
 
     if (!viewModel.data.value.data.isNullOrEmpty()) {
@@ -83,18 +87,21 @@ fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
         listOfProducts = viewModel.data.value.data!!.toList()
 
         Column {
-            Box(modifier = Modifier.weight(0.9f)) {
+            Box(modifier = Modifier.weight(0.8f)) {
                 LazyColumn(
                     contentPadding = PaddingValues(16.dp)
                 ) {
                     items(items = listOfProducts) { product ->
+                        totalPrice += product.priceWithDecimal!!.toDouble() * product.quantity!!.toDouble()
                         ProductRow(product)
                     }
                 }
             }
 
             Box(modifier = Modifier.weight(0.1f)) {
-                RoundedButton()
+                RoundedButton {
+                    navController.navigate(ShoppingScreens.CheckoutScreen.name + "/${totalPrice}")
+                }
             }
         }
     }
@@ -110,7 +117,7 @@ fun ProductRow(product: Product) {
         modifier = Modifier
             .padding(4.dp)
             .fillMaxWidth()
-            .height(136.dp)
+            .height(140.dp)
             .clickable { }
     ) {
         Row(modifier = Modifier
@@ -134,11 +141,15 @@ fun ProductRow(product: Product) {
             ) {
                 Text(
                     text = "${product.name}",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
                         .padding(start = 16.dp)
                 )
                 Text(
-                    text = "Description",
+                    text = "${product.shortDescription}",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
                         .padding(start = 16.dp)
                 )
