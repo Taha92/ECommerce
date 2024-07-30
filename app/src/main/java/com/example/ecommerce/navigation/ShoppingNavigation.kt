@@ -13,6 +13,7 @@ import com.example.ecommerce.screen.card.CardDetailScreen
 import com.example.ecommerce.screen.cart.CartScreenViewModel
 import com.example.ecommerce.screen.cart.ShoppingCartScreen
 import com.example.ecommerce.screen.detail.ItemDetailScreen
+import com.example.ecommerce.screen.history.OrderHistoryScreen
 import com.example.ecommerce.screen.home.HomeScreenViewModel
 import com.example.ecommerce.screen.home.ShoppingHomeScreen
 import com.example.ecommerce.screen.login.ShoppingLoginScreen
@@ -24,7 +25,7 @@ fun ShoppingNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = ShoppingScreens.CardDetailScreen.name
+        startDestination = ShoppingScreens.OrderHistoryScreen.name
     ) {
         composable(ShoppingScreens.ShoppingSplashScreen.name) {
             ShoppingSplashScreen(navController = navController)
@@ -63,6 +64,10 @@ fun ShoppingNavigation() {
 
         composable(ShoppingScreens.CardDetailScreen.name) {
             CardDetailScreen(navController = navController)
+        }
+
+        composable(ShoppingScreens.OrderHistoryScreen.name) {
+            OrderHistoryScreen(navController = navController)
         }
     }
 }
