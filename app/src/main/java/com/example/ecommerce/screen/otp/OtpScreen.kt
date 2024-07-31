@@ -1,11 +1,9 @@
 package com.example.ecommerce.screen.otp
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +29,7 @@ import androidx.navigation.NavHostController
 import com.example.ecommerce.component.OtpTextField
 import com.example.ecommerce.component.ShoppingAppBar
 import com.example.paymentsdk.Payment
+import com.example.paymentsdk.PaymentCallback
 import com.example.paymentsdk.PaymentInterface
 
 
@@ -85,7 +84,42 @@ fun PaymentContent(navController: NavController, totalPrice: String) {
             otpText = otpValue,
             onOtpTextChange = { value, otpInputFilled ->
                 otpValue = value
+            }
+        ) {
+            Log.d("TAG", "PaymentContent: Otp entered")
+            //show loader first
+            //start payment
+            paymentSDK.startPayment(
+                "1234567890123456",
+                "12/25",
+                "123",
+                100.0,
+                object : PaymentCallback {
+                    override fun onSuccess(message: String?) {
+                        // Handle success, prompt user to enter OTP
+                        Log.d("Payment", message!!)
+                    }
+
+                    override fun onFailure(error: String?) {
+                        // Handle failure
+                        Log.e("Payment", error!!)
+                    }
+                })
+
+
+            // Confirm payment
+            paymentSDK.confirmPayment("123456", object : PaymentCallback {
+                override fun onSuccess(message: String?) {
+                    // Handle success
+                    Log.d("confirmPayment", message!!)
+                }
+
+                override fun onFailure(error: String?) {
+                    // Handle failure
+                    Log.e("confirmPayment", error!!)
+                }
             })
+        }
 
         Text(modifier = Modifier
             .padding(top = 8.dp),

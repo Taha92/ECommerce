@@ -385,7 +385,8 @@ fun OtpTextField(
     modifier: Modifier = Modifier,
     otpText: String,
     otpCount: Int = 6,
-    onOtpTextChange: (String, Boolean) -> Unit
+    onOtpTextChange: (String, Boolean) -> Unit,
+    onComplete: () -> Unit = {}
 ) {
     LaunchedEffect(Unit) {
         if (otpText.length > otpCount) {
@@ -397,8 +398,11 @@ fun OtpTextField(
         modifier = modifier.padding(16.dp),
         value = TextFieldValue(otpText, selection = TextRange(otpText.length)),
         onValueChange = {
-            if (it.text.length <= otpCount) {
+            if (it.text.length < otpCount) {
                 onOtpTextChange.invoke(it.text, it.text.length == otpCount)
+            } else {
+                onOtpTextChange.invoke(it.text, it.text.length == otpCount)
+                onComplete.invoke()
             }
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
