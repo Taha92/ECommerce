@@ -18,6 +18,7 @@ import com.example.ecommerce.screen.history.OrderHistoryScreen
 import com.example.ecommerce.screen.home.HomeScreenViewModel
 import com.example.ecommerce.screen.home.ShoppingHomeScreen
 import com.example.ecommerce.screen.login.ShoppingLoginScreen
+import com.example.ecommerce.screen.otp.OtpScreen
 import com.google.gson.Gson
 
 @Composable
@@ -26,7 +27,7 @@ fun ShoppingNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = ShoppingScreens.ShoppingSplashScreen.name
+        startDestination = ShoppingScreens.OtpScreen.name
     ) {
         composable(ShoppingScreens.ShoppingSplashScreen.name) {
             ShoppingSplashScreen(navController = navController)
@@ -79,8 +80,13 @@ fun ShoppingNavigation() {
                 CheckoutScreen(navController = navController, totalPrice = it.toString())
             }
         }
+
         composable(ShoppingScreens.CheckoutScreen.name) {
             CheckoutScreen(navController = navController, totalPrice = it.toString())
+        }
+
+        composable(ShoppingScreens.OtpScreen.name) {
+            OtpScreen(navController = navController, totalPrice = it.toString())
         }
     }
 }
