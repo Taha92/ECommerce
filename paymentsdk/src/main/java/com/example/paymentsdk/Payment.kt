@@ -15,7 +15,7 @@ class Payment : PaymentInterface {
         // Simulate network delay
         Handler(Looper.getMainLooper()).postDelayed({
             // Dummy logic to simulate payment processing
-            if (cardNo == "1234567890123456") {
+            if (cardNo == cardNo) {
                 callback!!.onSuccess("Payment initiated. Enter OTP to confirm.")
             } else {
                 callback!!.onFailure("Invalid card details.")

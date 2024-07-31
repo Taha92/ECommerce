@@ -12,7 +12,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -30,24 +29,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.ecommerce.R
 import com.example.ecommerce.component.InputField
-import com.example.ecommerce.component.RoundedButton
+import com.example.ecommerce.component.RoundedSubmitButton
 import com.example.ecommerce.component.ShoppingAppBar
+import com.example.ecommerce.model.CardInfo
+import com.example.ecommerce.navigation.ShoppingScreens
+import com.google.gson.Gson
 
-@Preview
+
 @Composable
-fun CardDetailScreen(navController: NavController = NavController(LocalContext.current)) {
+fun CardDetailScreen(
+    navController: NavController,
+    totalPrice: String
+) {
 
     Scaffold(topBar = {
         ShoppingAppBar(
@@ -65,7 +67,7 @@ fun CardDetailScreen(navController: NavController = NavController(LocalContext.c
             .fillMaxSize()
         ) {
             //card content
-            CardDetailsContent()
+            CardDetailsContent(totalPrice = totalPrice, navController = navController)
         }
     }
 }
@@ -86,6 +88,7 @@ fun CardHolderNameInput(
         enabled = enabled,
         keyboardType = KeyboardType.Text,
         imeAction = imeAction,
+        maxChar = 25
     )
 }
 
@@ -103,8 +106,9 @@ fun CardNumberInput(
         valueState = numberState,
         labelId = labelId,
         enabled = enabled,
-        keyboardType = KeyboardType.Text,
-        imeAction = imeAction
+        keyboardType = KeyboardType.Number,
+        imeAction = imeAction,
+        maxChar = 16
     )
 }
 
@@ -122,7 +126,6 @@ fun CardMonthInput(
         valueState = monthState,
         labelId = labelId,
         enabled = enabled,
-        keyboardType = KeyboardType.Text,
         imeAction = imeAction,
         readOnly = true
     )
@@ -130,14 +133,12 @@ fun CardMonthInput(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MonthDropDown() {
+fun MonthDropDown(
+    monthState: MutableState<String>
+) {
 
     val list = listOf("01", "02", "03", "04", "05",
         "06", "07", "08", "09", "10", "11", "12")
-
-    val selectedText = remember {
-        mutableStateOf(list[0])
-    }
 
     val isExpanded = remember {
         mutableStateOf(false)
@@ -153,7 +154,7 @@ fun MonthDropDown() {
         ) {
             CardMonthInput(
                 modifier = Modifier.menuAnchor(),
-                monthState = selectedText,
+                monthState = monthState,
                 enabled = true,
                 onAction = KeyboardActions {
                     //passwordFocusRequest.requestFocus()
@@ -164,7 +165,7 @@ fun MonthDropDown() {
                     DropdownMenuItem(
                         text = { Text(text) },
                         onClick = {
-                            selectedText.value = list[index]
+                            monthState.value = list[index]
                             isExpanded.value = false
                         },
                         contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
@@ -178,7 +179,7 @@ fun MonthDropDown() {
 @Composable
 fun CardYearInput(
     modifier: Modifier = Modifier,
-    monthState: MutableState<String>,
+    yearState: MutableState<String>,
     labelId: String = "Year",
     enabled: Boolean = true,
     imeAction: ImeAction = ImeAction.Next,
@@ -186,7 +187,7 @@ fun CardYearInput(
 ) {
     InputField(
         modifier = modifier,
-        valueState = monthState,
+        valueState = yearState,
         labelId = labelId,
         enabled = enabled,
         imeAction = imeAction,
@@ -196,15 +197,14 @@ fun CardYearInput(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun YearDropDown() {
+fun YearDropDown(
+    yearState: MutableState<String>,
+    valid: Boolean
+) {
 
     val list = listOf("2024", "2025", "2026", "2027", "2028",
         "2029", "2030", "2031", "2032", "2033", "2034", "2035", "2036",
         "2037", "2038", "2039", "2040")
-
-    val selectedText = remember {
-        mutableStateOf(list[0])
-    }
 
     val isExpanded = remember {
         mutableStateOf(false)
@@ -220,10 +220,10 @@ fun YearDropDown() {
         ) {
             CardYearInput(
                 modifier = Modifier.menuAnchor(),
-                monthState = selectedText,
+                yearState = yearState,
                 enabled = true,
                 onAction = KeyboardActions {
-                    //passwordFocusRequest.requestFocus()
+                    if (!valid) return@KeyboardActions
                 })
             
 
@@ -232,7 +232,7 @@ fun YearDropDown() {
                     DropdownMenuItem(
                         text = { Text(text) },
                         onClick = {
-                            selectedText.value = list[index]
+                            yearState.value = list[index]
                             isExpanded.value = false
                         },
                         contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
@@ -244,16 +244,45 @@ fun YearDropDown() {
 }
 
 @Composable
+fun CardCVVInput(
+    modifier: Modifier = Modifier,
+    numberState: MutableState<String>,
+    labelId: String = "CVV",
+    enabled: Boolean = true,
+    imeAction: ImeAction = ImeAction.Next,
+    onAction: KeyboardActions = KeyboardActions.Default
+) {
+    InputField(
+        modifier = modifier,
+        valueState = numberState,
+        labelId = labelId,
+        enabled = enabled,
+        keyboardType = KeyboardType.Number,
+        imeAction = imeAction,
+        maxChar = 3
+    )
+}
+
+@Composable
 fun CardDetailsContent(
+    totalPrice: String,
     loading: Boolean = false,
+    navController: NavController
 ) {
     val cardHolderName = rememberSaveable { mutableStateOf("") }
     val cardNumber = rememberSaveable { mutableStateOf("") }
-    var cardMonthExpiry = rememberSaveable { mutableStateOf("") }
+    val cardMonthExpiry = rememberSaveable { mutableStateOf("") }
+    val cardYearExpiry = rememberSaveable { mutableStateOf("") }
+    val cardCvv = rememberSaveable { mutableStateOf("") }
+    val termsAndCondition = rememberSaveable { mutableStateOf(false) }
     val cardNumberFocusRequest = FocusRequester.Default
     val keyboardController = LocalSoftwareKeyboardController.current
-    val valid = remember(cardHolderName.value, cardNumber.value) {
-        cardHolderName.value.trim().isNotEmpty() && cardNumber.value.trim().isNotEmpty()
+    val valid = remember(cardHolderName.value, cardNumber.value,
+        cardMonthExpiry.value, cardYearExpiry.value, termsAndCondition.value, cardCvv.value
+    ) {
+        (cardHolderName.value.trim().isNotEmpty() && cardNumber.value.trim().isNotEmpty()
+                && cardMonthExpiry.value.trim().isNotEmpty() && cardYearExpiry.value.trim().isNotEmpty() &&
+                cardCvv.value.trim().isNotEmpty()) && termsAndCondition.value
     }
 
 
@@ -261,57 +290,88 @@ fun CardDetailsContent(
         .fillMaxSize()
         .padding(4.dp)
     ) {
-        HeaderDescription()
+        Column(modifier = Modifier.weight(0.8f)) {
+            HeaderDescription()
 
-        CardHolderNameInput(
-            nameState = cardHolderName,
-            enabled = !loading,
-            onAction = KeyboardActions {
-                cardNumberFocusRequest.requestFocus()
-            })
+            CardHolderNameInput(
+                nameState = cardHolderName,
+                enabled = !loading,
+                onAction = KeyboardActions {
+                    cardNumberFocusRequest.requestFocus()
+                })
 
-        CardNumberInput(
-            numberState = cardNumber,
-            enabled = !loading,
-            onAction = KeyboardActions {
-                //passwordFocusRequest.requestFocus()
-            })
+            CardNumberInput(
+                numberState = cardNumber,
+                enabled = !loading,
+                onAction = KeyboardActions {
+                    //passwordFocusRequest.requestFocus()
+                })
 
-        CardExpiryRow()
+            //CardExpiryRow()
+            Row(modifier = Modifier.height(80.dp)) {
+                Box(modifier = Modifier.weight(0.5f)) {
+                    MonthDropDown(cardMonthExpiry)
+                }
+                Box(modifier = Modifier.weight(0.5f)) {
+                    YearDropDown(cardYearExpiry, valid)
+                }
+            }
 
-        TermsAndCondition()
+            CardCVVInput(
+                numberState = cardCvv,
+                enabled = !loading,
+                onAction = KeyboardActions {
+                    //passwordFocusRequest.requestFocus()
+                })
 
-        SubmitButton(
-            loading = loading,
-            validInputs = valid
-        ) {
-            //onDone(email.value.trim(), password.value.trim())
-            keyboardController?.hide()
+            TermsAndCondition(termsAndCondition)
+
+            Row(modifier = Modifier
+                .padding(16.dp)
+            ){
+                Image(
+                    painter = painterResource(id = R.mipmap.master_card),
+                    contentDescription = "Master card icon",
+                    modifier = Modifier
+                        .size(42.dp)
+                )
+                Image(
+                    painter = painterResource(id = R.mipmap.visa_card),
+                    contentDescription = "Visa card icon",
+                    modifier = Modifier
+                        .size(42.dp)
+                        .padding(start = 6.dp)
+                )
+                Image(
+                    painter = painterResource(id = R.mipmap.american_express_card),
+                    contentDescription = "American express card icon",
+                    modifier = Modifier
+                        .size(42.dp)
+                        .padding(start = 6.dp)
+                )
+            }
         }
 
-        Row(modifier = Modifier
-            .padding(16.dp)
-        ){
-            Image(
-                painter = painterResource(id = R.mipmap.master_card),
-                contentDescription = "Master card icon",
-                modifier = Modifier
-                    .size(42.dp)
-            )
-            Image(
-                painter = painterResource(id = R.mipmap.visa_card),
-                contentDescription = "Visa card icon",
-                modifier = Modifier
-                    .size(42.dp)
-                    .padding(start = 6.dp)
-            )
-            Image(
-                painter = painterResource(id = R.mipmap.american_express_card),
-                contentDescription = "American express card icon",
-                modifier = Modifier
-                    .size(42.dp)
-                    .padding(start = 6.dp)
-            )
+        val cardInfo = CardInfo(
+            holderName = cardHolderName.value,
+            holderNumber = cardNumber.value,
+            expiryMonth = cardMonthExpiry.value,
+            expiryYear = cardYearExpiry.value,
+            cardCvv = cardCvv.value
+        )
+        val cardInfoJson = Gson().toJson(cardInfo)
+
+        Box(modifier = Modifier.weight(0.1f)) {
+            SubmitButton(
+                loading = loading,
+                validInputs = valid,
+                totalPrice = totalPrice,
+                navController = navController,
+                cardInfoJson = cardInfoJson
+            ) {
+                //onDone(email.value.trim(), password.value.trim())
+                keyboardController?.hide()
+            }
         }
     }
 }
@@ -320,17 +380,21 @@ fun CardDetailsContent(
 fun SubmitButton(
     loading: Boolean,
     validInputs: Boolean,
-    onClick: () -> Unit
+    totalPrice: String,
+    navController: NavController,
+    cardInfoJson: String,
+    onClick: () -> Unit,
 ) {
-    RoundedButton() {
-        //if (loading) CircularProgressIndicator(modifier = Modifier.size(25.dp))
+    RoundedSubmitButton(validInputs = validInputs) {
+        navController.navigate(ShoppingScreens.CheckoutScreen.name + "?cardInfo=${cardInfoJson}?totalBill=${totalPrice}")
     }
 }
 
-@Preview
+
 @Composable
-fun TermsAndCondition() {
-    val checked = remember { mutableStateOf(false) }
+fun TermsAndCondition(
+    checked: MutableState<Boolean>
+) {
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         Checkbox(
@@ -347,7 +411,7 @@ fun TermsAndCondition() {
     }
 }
 
-@Composable
+/*@Composable
 fun CardExpiryRow() {
     Row(modifier = Modifier.height(80.dp)) {
         Box(modifier = Modifier.weight(0.5f)) {
@@ -357,7 +421,7 @@ fun CardExpiryRow() {
             YearDropDown()
         }
     }
-}
+}*/
 
 @Composable
 fun HeaderDescription() {

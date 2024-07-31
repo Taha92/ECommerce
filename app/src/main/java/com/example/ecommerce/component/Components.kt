@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -23,6 +24,10 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.ShoppingCart
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
@@ -43,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextRange
@@ -57,6 +63,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -275,12 +282,14 @@ fun InputField(
     keyboardType: KeyboardType = KeyboardType.Text,
     imeAction: ImeAction = ImeAction.Next,
     onAction: KeyboardActions = KeyboardActions.Default,
-    readOnly: Boolean = false
+    readOnly: Boolean = false,
+    maxChar: Int? = 50
 ) {
     OutlinedTextField(
         value = valueState.value,
         onValueChange = {
-            valueState.value = it
+            if (it.length <= maxChar!!) valueState.value = it
+            //valueState.value = it
         },
         label = { Text(text = labelId) },
         singleLine = isSingleLine,
@@ -294,7 +303,8 @@ fun InputField(
         enabled = enabled,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
         keyboardActions = onAction,
-        readOnly = readOnly
+        readOnly = readOnly,
+        maxLines = 1
     )
 }
 
@@ -345,10 +355,44 @@ fun PasswordVisibility(passwordVisibility: MutableState<Boolean>) {
     }
 }
 
+@Preview
+@Composable
+fun RoundedSubmitButton(
+    label: String = "Continue",
+    radius: Int = 29,
+    loading: Boolean = true,
+    validInputs: Boolean = true,
+    onClick: () -> Unit = {}
+) {
+    Box(modifier = Modifier.padding(16.dp)) {
+        Button(
+            onClick = onClick,
+            modifier = Modifier
+                .heightIn(60.dp)
+                .fillMaxWidth()
+                .clip(
+                    RoundedCornerShape(
+                        bottomEndPercent = radius,
+                        bottomStartPercent = radius,
+                        topStartPercent = radius,
+                        topEndPercent = radius
+                    )
+                ),
+            enabled = validInputs,
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF92CBDF)),
+            shape = RectangleShape
+        ) {
+            /*if (loading) CircularProgressIndicator(modifier = Modifier.size(25.dp))
+            else */Text(text = label, modifier = Modifier.padding(5.dp))
+        }
+    }
+}
+
 @Composable
 fun RoundedButton(
     label: String = "Continue",
     radius: Int = 29,
+    enabled: Boolean = false,
     onPress: () -> Unit = {}
 ) {
     Surface(modifier = Modifier
@@ -380,6 +424,7 @@ fun RoundedButton(
         }
     }
 }
+
 @Composable
 fun OtpTextField(
     modifier: Modifier = Modifier,
@@ -433,16 +478,16 @@ private fun CharView(
     }
     Text(
         modifier = Modifier
-            .width(40.dp)
+            .width(46.dp)
             .border(
                 2.dp, when {
                     isFocused -> Color(0xFF92CBDF)
                     else -> Color.LightGray
                 }, RoundedCornerShape(8.dp)
             )
-            .padding(12.dp),
+            .padding(22.dp),
         text = char,
-        style = MaterialTheme.typography.bodyLarge,
+        style = MaterialTheme.typography.titleLarge,
         color = if (isFocused) {
             Color.LightGray
         } else {

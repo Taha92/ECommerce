@@ -37,12 +37,9 @@ import com.example.paymentsdk.PaymentInterface
 fun OtpScreen(navController: NavHostController, totalPrice: String) {
     Scaffold(topBar = {
         ShoppingAppBar(title = "Payment",
-            icon = Icons.Default.ArrowBack,
             isMainScreen = false,
             navController = navController
-        ) {
-            navController.popBackStack()
-        }
+        )
     }) {
         //content
         Surface(modifier = Modifier
@@ -88,23 +85,6 @@ fun PaymentContent(navController: NavController, totalPrice: String) {
         ) {
             Log.d("TAG", "PaymentContent: Otp entered")
             //show loader first
-            //start payment
-            paymentSDK.startPayment(
-                "1234567890123456",
-                "12/25",
-                "123",
-                100.0,
-                object : PaymentCallback {
-                    override fun onSuccess(message: String?) {
-                        // Handle success, prompt user to enter OTP
-                        Log.d("Payment", message!!)
-                    }
-
-                    override fun onFailure(error: String?) {
-                        // Handle failure
-                        Log.e("Payment", error!!)
-                    }
-                })
 
 
             // Confirm payment
@@ -135,17 +115,6 @@ fun PaymentContent(navController: NavController, totalPrice: String) {
                 append("Resend")
             }
         })
-
-        /*Column(modifier = Modifier
-            .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            OtpTextField(
-                otpText = otpValue,
-                onOtpTextChange = { value, otpInputFilled ->
-                    otpValue = value
-                })
-        }*/
     }
 
 }
