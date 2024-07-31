@@ -19,6 +19,7 @@ import com.example.ecommerce.screen.history.OrderHistoryScreen
 import com.example.ecommerce.screen.home.HomeScreenViewModel
 import com.example.ecommerce.screen.home.ShoppingHomeScreen
 import com.example.ecommerce.screen.login.ShoppingLoginScreen
+import com.example.ecommerce.screen.orderSuccess.OrderPlacedScreen
 import com.example.ecommerce.screen.otp.OtpScreen
 import com.google.gson.Gson
 
@@ -28,7 +29,7 @@ fun ShoppingNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = ShoppingScreens.ShoppingSplashScreen.name
+        startDestination = ShoppingScreens.OrderPlacedScreen.name
     ) {
         composable(ShoppingScreens.ShoppingSplashScreen.name) {
             ShoppingSplashScreen(navController = navController)
@@ -78,15 +79,6 @@ fun ShoppingNavigation() {
             OrderHistoryScreen(navController = navController)
         }
 
-        /*val checkoutScreenName = ShoppingScreens.CheckoutScreen.name
-        composable("$checkoutScreenName/{totalPrice}", arguments = listOf(navArgument("totalPrice") {
-            type = NavType.StringType
-        })) { backStackEntry ->
-            backStackEntry.arguments?.getString("totalPrice").let {
-                CheckoutScreen(navController = navController, totalPrice = it.toString())
-            }
-        }*/
-
         val checkoutScreenName = ShoppingScreens.CheckoutScreen.name
         composable(
             "$checkoutScreenName?cardInfo={cardInfo}?totalBill={totalBill}",
@@ -111,12 +103,12 @@ fun ShoppingNavigation() {
             CheckoutScreen(navController = navController, cardInfo = cardInfo, totalBill = totalBillJsonString.toString())
         }
 
-        /*composable(ShoppingScreens.CheckoutScreen.name) {
-            CheckoutScreen(navController = navController, totalPrice = "0")
-        }*/
-
         composable(ShoppingScreens.OtpScreen.name) {
             OtpScreen(navController = navController, totalPrice = it.toString())
+        }
+
+        composable(ShoppingScreens.OrderPlacedScreen.name) {
+            OrderPlacedScreen(navController = navController)
         }
     }
 }
