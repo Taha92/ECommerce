@@ -46,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.ecommerce.component.ShoppingAppBar
@@ -174,20 +175,40 @@ fun ExpandableCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(padding)
+                .padding(22.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    modifier = Modifier
-                        .weight(6f),
-                    text = title,
-                    fontSize = titleFontSize,
-                    fontWeight = titleFontWeight,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(6f)) {
+                    Text(
+                        modifier = Modifier
+                            .padding(2.dp),
+                        text = title,
+                        fontSize = titleFontSize,
+                        fontWeight = titleFontWeight,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(modifier = Modifier
+                        .padding(2.dp),
+                        text = "16/06/2024",
+                        fontSize = 14.sp,
+                        fontWeight = titleFontWeight,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(modifier = Modifier
+                        .padding(2.dp),
+                        text = "₺51.20",
+                        fontSize = 14.sp,
+                        fontWeight = titleFontWeight,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
                 IconButton(
                     modifier = Modifier
                         .weight(1f)

@@ -29,7 +29,7 @@ fun ShoppingNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = ShoppingScreens.OrderPlacedScreen.name
+        startDestination = ShoppingScreens.OrderHistoryScreen.name
     ) {
         composable(ShoppingScreens.ShoppingSplashScreen.name) {
             ShoppingSplashScreen(navController = navController)
@@ -76,6 +76,7 @@ fun ShoppingNavigation() {
         }
 
         composable(ShoppingScreens.OrderHistoryScreen.name) {
+            //val cartViewModel = hiltViewModel<CartScreenViewModel>()
             OrderHistoryScreen(navController = navController)
         }
 
@@ -103,8 +104,15 @@ fun ShoppingNavigation() {
             CheckoutScreen(navController = navController, cardInfo = cardInfo, totalBill = totalBillJsonString.toString())
         }
 
-        composable(ShoppingScreens.OtpScreen.name) {
-            OtpScreen(navController = navController, totalPrice = it.toString())
+
+        val otpScreenName = ShoppingScreens.OtpScreen.name
+        composable("$otpScreenName/{totalBill}", arguments = listOf(navArgument("totalBill") {
+            type = NavType.StringType
+        })) { backStackEntry ->
+            backStackEntry.arguments?.getString("totalBill").let {
+                val cartViewModel = hiltViewModel<CartScreenViewModel>()
+                OtpScreen(navController = navController, totalBill = it.toString(), cartViewModel)
+            }
         }
 
         composable(ShoppingScreens.OrderPlacedScreen.name) {

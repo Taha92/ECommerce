@@ -36,13 +36,18 @@ import com.example.ecommerce.R
 import com.example.ecommerce.component.RoundedSubmitButton
 import com.example.ecommerce.component.ShoppingAppBar
 import com.example.ecommerce.model.CardInfo
+import com.example.ecommerce.model.Product
 import com.example.ecommerce.navigation.ShoppingScreens
 import com.example.paymentsdk.Payment
 import com.example.paymentsdk.PaymentCallback
 import com.example.paymentsdk.PaymentInterface
 
 @Composable
-fun CheckoutScreen(navController: NavController, cardInfo: CardInfo, totalBill: String) {
+fun CheckoutScreen(
+    navController: NavController,
+    cardInfo: CardInfo,
+    totalBill: String,
+) {
     Scaffold(topBar = {
         ShoppingAppBar(title = "Checkout",
             icon = Icons.Default.ArrowBack,
@@ -71,6 +76,7 @@ fun CheckoutContent(
     totalPrice: String
 ) {
     val totalPayable = (totalPrice.toDouble() * 10) / 100
+    val formattedTotal = String.format("₺%.2f", totalPrice.toDouble() - totalPayable)
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -181,7 +187,7 @@ fun CheckoutContent(
                     color = Color.Red.copy(alpha = 0.5f)
                 )
                 Text(
-                    text = String.format("₺%.2f", totalPrice.toDouble() - totalPayable),
+                    text = formattedTotal,
                     style = MaterialTheme.typography.titleLarge,
                     color = Color.Red.copy(alpha = 0.5f)
                 )
@@ -191,7 +197,7 @@ fun CheckoutContent(
         Box(modifier = Modifier.weight(0.1f)) {
             RoundedSubmitButton(label = "Order and Pay") {
                 //navController.navigate(ShoppingScreens.CardDetailScreen.name)
-                startPaymentProcess(navController, cardInfo, totalPayable)
+                startPaymentProcess(navController, cardInfo, formattedTotal.toDouble())
             }
         }
     }
@@ -210,7 +216,8 @@ fun startPaymentProcess(navController: NavController, cardInfo: CardInfo, totalP
             override fun onSuccess(message: String?) {
                 // Handle success, prompt user to enter OTP
                 Log.d("Payment", message!!)
-                navController.navigate(ShoppingScreens.OtpScreen.name)
+                navController.navigate(ShoppingScreens.OtpScreen.name + "/${totalPayable}")
+                //navController.navigate(ShoppingScreens.OtpScreen.name)
             }
 
             override fun onFailure(error: String?) {
