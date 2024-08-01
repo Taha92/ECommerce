@@ -1,6 +1,5 @@
 package com.example.ecommerce.screen.home
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,12 +41,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.ecommerce.component.ShoppingAppBar
+import com.example.ecommerce.component.performDatabaseOperation
 import com.example.ecommerce.model.Product
 import com.example.ecommerce.model.ProductXX
 import com.example.ecommerce.navigation.ShoppingScreens
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QueryDocumentSnapshot
 import com.google.gson.Gson
 
 
@@ -92,6 +90,7 @@ fun HomeContent(
 @Composable
 private fun ProductsGridView(product: ProductXX, navController: NavController) {
 
+    val context = LocalContext.current
     val iconSize = 24.dp
     val offsetInPx = LocalDensity.current.run { (iconSize / 2).roundToPx() }
 
@@ -148,7 +147,7 @@ private fun ProductsGridView(product: ProductXX, navController: NavController) {
                     image = product.thumbnailURL,
                     quantity = "1",
                 )
-                performDatabaseOperation(mProduct)
+                performDatabaseOperation(mProduct, "Add", context)
             },
             modifier = Modifier
                 .offset {
@@ -167,7 +166,7 @@ private fun ProductsGridView(product: ProductXX, navController: NavController) {
     }
 }
 
-fun performDatabaseOperation(product: Product) {
+/*fun performDatabaseOperation(product: Product) {
 
     val db = FirebaseFirestore.getInstance()
     val dbCollection = db.collection("products")
@@ -226,4 +225,4 @@ fun updateProductInDatabase(
         .addOnFailureListener {
             Log.d("Error", "SaveToFirebase: Error updating doc")
         }
-}
+}*/

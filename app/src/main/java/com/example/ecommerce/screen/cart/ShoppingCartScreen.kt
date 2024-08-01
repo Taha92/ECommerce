@@ -29,13 +29,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -44,6 +46,7 @@ import coil.compose.rememberImagePainter
 import com.example.ecommerce.R
 import com.example.ecommerce.component.ShoppingAppBar
 import com.example.ecommerce.component.RoundedButton
+import com.example.ecommerce.component.performDatabaseOperation
 import com.example.ecommerce.model.Product
 import com.example.ecommerce.navigation.ShoppingScreens
 
@@ -110,6 +113,8 @@ fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
 
 @Composable
 fun ProductRow(product: Product) {
+    val context = LocalContext.current
+    val productQuantity = rememberSaveable { mutableStateOf(product.quantity!!.toInt()) }
 
     Card(
         shape = RoundedCornerShape(29.dp),
@@ -168,7 +173,8 @@ fun ProductRow(product: Product) {
                 ) {
                     IconButton(
                         onClick = {
-
+                            productQuantity.value--
+                            performDatabaseOperation(product, "Subtract", context)
                         },
                         modifier = Modifier
                             .padding(10.dp)
@@ -183,7 +189,7 @@ fun ProductRow(product: Product) {
                     }
 
                     Text(
-                        text = "${product.quantity}",
+                        text = productQuantity.value.toString(),
                         fontSize = 16.sp,
                         modifier = Modifier
                             .padding(top = 16.dp)
@@ -191,7 +197,8 @@ fun ProductRow(product: Product) {
 
                     IconButton(
                         onClick = {
-
+                            productQuantity.value++
+                            performDatabaseOperation(product, "Add", context)
                         },
                         modifier = Modifier
                             .padding(10.dp)

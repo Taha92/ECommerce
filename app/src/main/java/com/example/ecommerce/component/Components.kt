@@ -1,5 +1,8 @@
 package com.example.ecommerce.component
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,12 +11,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -25,11 +26,8 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.ShoppingCart
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -64,13 +62,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ecommerce.R
+import com.example.ecommerce.model.Product
 import com.example.ecommerce.navigation.ShoppingScreens
 import com.example.ecommerce.screen.home.HomeScreenViewModel
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QueryDocumentSnapshot
 
 
 @Composable
@@ -498,4 +499,76 @@ private fun CharView(
         },
         textAlign = TextAlign.Center
     )
+}
+
+fun performDatabaseOperation(product: Product, operation: String, context: Context) {
+
+    val db = FirebaseFirestore.getInstance()
+    val dbCollection = db.collection("products")
+    val query = dbCollection.whereEqualTo("name", product.name.toString())
+
+    query.get().addOnSuccessListener { snapshot ->
+        if (snapshot.size() > 0) {
+            for (document in snapshot) {
+                if (document.exists()) {
+                    //Update quantity
+                    updateProductInDatabase(dbCollection, document, operation, context)
+                } else {
+                    //Save new item
+                    saveProductInDatabase(product, dbCollection, context)
+                }
+            }
+        } else {
+            //Log.e("TAG", "performDatabaseOperation: ", )
+            saveProductInDatabase(product, dbCollection, context)
+        }
+    }
+}
+
+fun saveProductInDatabase(product: Product, dbCollection: CollectionReference, context: Context) {
+    if (product.toString().isNotEmpty()) {
+        dbCollection.add(product)
+            .addOnSuccessListener { documentRef ->
+                val docId = documentRef.id
+                dbCollection.document(docId)
+                    .update(hashMapOf("id" to docId) as Map<String, Any>)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            Toast.makeText(context, "Item Added!", Toast.LENGTH_SHORT).show()
+                            Log.d("Success", "SaveToFirebase: Saved Successfully!")
+                        }
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
+                        Log.d("Error", "SaveToFirebase: Error updating doc")
+                    }
+            }
+    }
+}
+
+fun updateProductInDatabase(
+    dbCollection: CollectionReference,
+    document: QueryDocumentSnapshot,
+    operation: String,
+    context: Context
+) {
+
+    val increment: Int = if (operation.equals("Add", true)) {
+        (document.data["quantity"] as String).toInt() + 1
+    } else {
+        (document.data["quantity"] as String).toInt() - 1
+    }
+
+    dbCollection.document(document.id)
+        .update(hashMapOf("quantity" to increment.toString()) as Map<String, Any>)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Toast.makeText(context, "Item Added!", Toast.LENGTH_SHORT).show()
+                Log.d("Success", "SaveToFirebase: Updated Successfully!")
+            }
+        }
+        .addOnFailureListener {
+            Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
+            Log.d("Error", "SaveToFirebase: Error updating doc")
+        }
 }
