@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Checkbox
@@ -55,6 +57,7 @@ fun CardDetailScreen(
         ShoppingAppBar(
             title = "Card Details",
             icon = Icons.Default.ArrowBack,
+            showProfile = false,
             isMainScreen = false,
             navController = navController
         ) {
@@ -289,6 +292,7 @@ fun CardDetailsContent(
     Column(modifier = Modifier
         .fillMaxSize()
         .padding(4.dp)
+        .verticalScroll(rememberScrollState())
     ) {
         Column(modifier = Modifier.weight(0.8f)) {
             HeaderDescription()

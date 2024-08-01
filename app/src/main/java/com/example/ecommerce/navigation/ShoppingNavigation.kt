@@ -31,7 +31,7 @@ fun ShoppingNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = ShoppingScreens.ShoppingCartScreen.name
+        startDestination = ShoppingScreens.ShoppingSplashScreen.name
     ) {
         composable(ShoppingScreens.ShoppingSplashScreen.name) {
             ShoppingSplashScreen(navController = navController)

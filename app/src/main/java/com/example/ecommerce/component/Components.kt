@@ -238,14 +238,14 @@ fun ShoppingAppBar(
                         tint = Color.Red.copy(alpha = 0.7f),
                     )
                 } else {
-                    IconButton(onClick = {
+                    /*IconButton(onClick = {
 
                     }) {
                         Icon(
                             imageVector = Icons.Rounded.Delete,
                             contentDescription = "Empty cart icon",
                         )
-                    }
+                    }*/
                 }
             }
         },
@@ -570,5 +570,21 @@ fun updateProductInDatabase(
         .addOnFailureListener {
             Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
             Log.d("Error", "SaveToFirebase: Error updating doc")
+        }
+}
+
+fun deleteProductFromDatabase(product: Product) {
+    FirebaseFirestore.getInstance()
+        .collection("products")
+        .document(product.id!!)
+        .delete()
+        .addOnCompleteListener {
+            if (it.isSuccessful) {
+
+                /*Don't popBackStack() if we want the immediate recomposition
+                of the MainScreen UI, instead navigate to the mainScreen!*/
+
+                //navController.navigate(ReaderScreens.ReaderHomeScreen.name)
+            }
         }
 }

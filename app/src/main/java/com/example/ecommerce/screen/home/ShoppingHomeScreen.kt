@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -45,6 +46,7 @@ import com.example.ecommerce.component.performDatabaseOperation
 import com.example.ecommerce.model.Product
 import com.example.ecommerce.model.ProductXX
 import com.example.ecommerce.navigation.ShoppingScreens
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 
 
@@ -78,11 +80,22 @@ fun HomeContent(
 ) {
     val listOfProducts = viewModel.list
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(3)
-    ) {
-        items(items = listOfProducts) {product ->
-            ProductsGridView(product, navController)
+    if (viewModel.isLoading) {
+        Column(modifier = Modifier
+            .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            CircularProgressIndicator()
+            Text(text = "Loading...")
+        }
+    } else {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3)
+        ) {
+            items(items = listOfProducts) {product ->
+                ProductsGridView(product, navController)
+            }
         }
     }
 }
@@ -95,7 +108,6 @@ private fun ProductsGridView(product: ProductXX, navController: NavController) {
     val offsetInPx = LocalDensity.current.run { (iconSize / 2).roundToPx() }
 
     Box(modifier = Modifier.padding((iconSize / 2))) {
-
         Card(
             modifier = Modifier
                 .height(152.dp)
@@ -146,6 +158,7 @@ private fun ProductsGridView(product: ProductXX, navController: NavController) {
                     priceWithDecimal = product.price,
                     image = product.thumbnailURL,
                     quantity = "1",
+                    userId = FirebaseAuth.getInstance().currentUser?.uid.toString()
                 )
                 performDatabaseOperation(mProduct, "Add", context)
             },

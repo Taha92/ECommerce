@@ -143,7 +143,7 @@ fun ExpandableCard(
                                 )
                                 Text(modifier = Modifier
                                     .padding(2.dp),
-                                    text = "Date: ${product.dateTime}",
+                                    text = "Date: ${product.date}",
                                     fontSize = 14.sp,
                                     fontWeight = titleFontWeight,
                                     maxLines = 1,

@@ -28,6 +28,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.ecommerce.component.OtpTextField
 import com.example.ecommerce.component.ShoppingAppBar
+import com.example.ecommerce.component.deleteProductFromDatabase
 import com.example.ecommerce.model.OrderHistoryItem
 import com.example.ecommerce.model.Product
 import com.example.ecommerce.navigation.ShoppingScreens
@@ -35,6 +36,7 @@ import com.example.ecommerce.screen.cart.CartScreenViewModel
 import com.example.paymentsdk.Payment
 import com.example.paymentsdk.PaymentCallback
 import com.example.paymentsdk.PaymentInterface
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
@@ -63,11 +65,10 @@ fun OtpScreen(navController: NavHostController, totalBill: String, cartViewModel
 @Composable
 fun PaymentContent(navController: NavController, totalBill: String, viewModel: CartScreenViewModel) {
     var listOfProducts: List<Product> = emptyList()
-    val sdf = SimpleDateFormat("dd-MM-yyyy")
+    val sdf = SimpleDateFormat("dd/MM/yyyy")
     val currentDateAndTime = sdf.format(Date())
-    var otpValue by remember {
-        mutableStateOf("")
-    }
+    var otpValue by remember { mutableStateOf("") }
+    val orderId by remember { mutableStateOf(0) }
 
     val paymentSDK: PaymentInterface = Payment()
 
@@ -108,12 +109,17 @@ fun PaymentContent(navController: NavController, totalBill: String, viewModel: C
                     // Handle success
                     Log.d("confirmPayment", message!!)
                     val products = OrderHistoryItem(
-                        orderId = "1",
+                        orderId = (orderId+1).toString(),
+                        userId = FirebaseAuth.getInstance().currentUser?.uid.toString(),
                         products = listOfProducts,
-                        dateTime = currentDateAndTime,
+                        date = currentDateAndTime,
                         totalBill = totalBill
                     )
                     saveOrderHistoryInDatabase(products)
+
+                    /*for (product in listOfProducts) {
+                        deleteProductFromDatabase(product)
+                    }*/
 
                     //Go to order placed screen
                     navController.navigate(ShoppingScreens.OrderPlacedScreen.name)

@@ -14,7 +14,6 @@ class ProductRepository @Inject constructor(private val api: ProductsApi) {
             Resource.Loading(data = true)
 
             val itemList = api.getAllProducts()
-            Log.d("TAG", "getProducts: ${itemList.size}")
             if (itemList.isNotEmpty()) Resource.Loading(data = false)
             Resource.Success(data = itemList[0].products)
 

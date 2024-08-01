@@ -1,5 +1,8 @@
 package com.example.ecommerce.screen.cart
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,14 +26,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -46,6 +54,7 @@ import coil.compose.rememberImagePainter
 import com.example.ecommerce.R
 import com.example.ecommerce.component.ShoppingAppBar
 import com.example.ecommerce.component.RoundedButton
+import com.example.ecommerce.component.deleteProductFromDatabase
 import com.example.ecommerce.component.performDatabaseOperation
 import com.example.ecommerce.model.Product
 import com.example.ecommerce.navigation.ShoppingScreens
@@ -59,6 +68,7 @@ fun ShoppingCartScreen(
     Scaffold(topBar = {
         ShoppingAppBar(title = "Cart",
             icon = Icons.Default.ArrowBack,
+            showProfile = false,
             isMainScreen = false,
             navController = navController
         ) {
@@ -79,25 +89,45 @@ fun ShoppingCartScreen(
 
 @Composable
 fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
-    val listOfProducts: List<Product>
+    val listOfProducts: MutableList<Product>
     var totalPrice = 0.0
+    val deletedItem = remember { mutableStateListOf<Product>() }
     //val currentUser = FirebaseAuth.getInstance().currentUser
 
-    if (!viewModel.data.value.data.isNullOrEmpty()) {
-        /*listOfProducts = viewModel.data.value.data!!.toList().filter { mBook ->
-            mBook.userId == currentUser?.uid.toString()
-        }*/
-        listOfProducts = viewModel.data.value.data!!.toList()
+    if (viewModel.data.value.loading!!) {
+        Column(modifier = Modifier
+            .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            CircularProgressIndicator()
+            Text(text = "Loading...")
+        }
+    } else if (!viewModel.data.value.data.isNullOrEmpty()) {
+        listOfProducts = viewModel.data.value.data!!.toMutableList()
 
         Column {
             Box(modifier = Modifier.weight(0.8f)) {
                 LazyColumn(
                     contentPadding = PaddingValues(16.dp)
                 ) {
-                    items(items = listOfProducts) { product ->
+                    /*items(items = listOfProducts) { product ->
                         totalPrice += product.priceWithDecimal!!.toDouble() * product.quantity!!.toDouble()
-                        ProductRow(product)
-                    }
+                        ProductRow(product, listOfProducts)
+                    }*/
+                    items(
+                        items = listOfProducts,
+                        itemContent = {product ->
+                            androidx.compose.animation.AnimatedVisibility(
+                                visible = !deletedItem.contains(product),
+                                enter = expandVertically(),
+                                exit = shrinkVertically(animationSpec = tween(durationMillis = 1000))
+                            ) {
+                                totalPrice += product.priceWithDecimal!!.toDouble() * product.quantity!!.toDouble()
+                                ProductRow(product, listOfProducts, deletedItem)
+                            }
+                        }
+                    )
                 }
             }
 
@@ -108,13 +138,27 @@ fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
                 }
             }
         }
+
+    } else {
+        Column(modifier = Modifier
+            .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = "No item in cart...")
+        }
     }
 }
 
 @Composable
-fun ProductRow(product: Product) {
+fun ProductRow(
+    product: Product,
+    listOfProducts: MutableList<Product>,
+    deletedItem: SnapshotStateList<Product>
+) {
     val context = LocalContext.current
     val productQuantity = rememberSaveable { mutableStateOf(product.quantity!!.toInt()) }
+    //val deletedItem = remember { mutableStateListOf<Product>() }
 
     Card(
         shape = RoundedCornerShape(29.dp),
@@ -174,7 +218,12 @@ fun ProductRow(product: Product) {
                     IconButton(
                         onClick = {
                             productQuantity.value--
-                            performDatabaseOperation(product, "Subtract", context)
+                            if (productQuantity.value == 0) {
+                                deleteProductFromDatabase(product)
+                                deletedItem.add(product)
+                            } else {
+                                performDatabaseOperation(product, "Subtract", context)
+                            }
                         },
                         modifier = Modifier
                             .padding(10.dp)

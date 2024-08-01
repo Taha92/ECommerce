@@ -31,6 +31,8 @@ class CartScreenViewModel @Inject constructor(private val repository: FireReposi
 
             if (!data.value.data.isNullOrEmpty()) {
                 data.value.loading = false
+            } else if (data.value.data.isNullOrEmpty()) {
+                data.value.loading = false
             }
         }
     }

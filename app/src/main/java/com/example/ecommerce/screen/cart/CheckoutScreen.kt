@@ -51,6 +51,7 @@ fun CheckoutScreen(
     Scaffold(topBar = {
         ShoppingAppBar(title = "Checkout",
             icon = Icons.Default.ArrowBack,
+            showProfile = false,
             isMainScreen = false,
             navController = navController
         ) {
@@ -76,7 +77,7 @@ fun CheckoutContent(
     totalPrice: String
 ) {
     val totalPayable = (totalPrice.toDouble() * 10) / 100
-    val formattedTotal = String.format("₺%.2f", totalPrice.toDouble() - totalPayable)
+    val formattedTotal = String.format("%.2f", totalPrice.toDouble() - totalPayable)
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -138,7 +139,7 @@ fun CheckoutContent(
                     modifier = Modifier.weight(0.9f)
                 )
                 Text(
-                    text = "₺${totalPrice}",
+                    text = String.format("₺%.2f", totalPrice.toDouble()),
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
@@ -187,7 +188,7 @@ fun CheckoutContent(
                     color = Color.Red.copy(alpha = 0.5f)
                 )
                 Text(
-                    text = formattedTotal,
+                    text = "₺${formattedTotal}",
                     style = MaterialTheme.typography.titleLarge,
                     color = Color.Red.copy(alpha = 0.5f)
                 )
