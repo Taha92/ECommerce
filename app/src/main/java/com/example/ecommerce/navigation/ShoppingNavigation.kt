@@ -16,11 +16,13 @@ import com.example.ecommerce.screen.cart.CheckoutScreen
 import com.example.ecommerce.screen.cart.ShoppingCartScreen
 import com.example.ecommerce.screen.detail.ItemDetailScreen
 import com.example.ecommerce.screen.history.OrderHistoryScreen
+import com.example.ecommerce.screen.history.OrderHistoryViewModel
 import com.example.ecommerce.screen.home.HomeScreenViewModel
 import com.example.ecommerce.screen.home.ShoppingHomeScreen
 import com.example.ecommerce.screen.login.ShoppingLoginScreen
 import com.example.ecommerce.screen.orderSuccess.OrderPlacedScreen
 import com.example.ecommerce.screen.otp.OtpScreen
+import com.example.ecommerce.screen.profile.ProfileScreen
 import com.google.gson.Gson
 
 @Composable
@@ -29,7 +31,7 @@ fun ShoppingNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = ShoppingScreens.OrderHistoryScreen.name
+        startDestination = ShoppingScreens.ProfileScreen.name
     ) {
         composable(ShoppingScreens.ShoppingSplashScreen.name) {
             ShoppingSplashScreen(navController = navController)
@@ -76,8 +78,8 @@ fun ShoppingNavigation() {
         }
 
         composable(ShoppingScreens.OrderHistoryScreen.name) {
-            //val cartViewModel = hiltViewModel<CartScreenViewModel>()
-            OrderHistoryScreen(navController = navController)
+            val orderHistoryViewModel = hiltViewModel<OrderHistoryViewModel>()
+            OrderHistoryScreen(navController = navController, orderHistoryViewModel)
         }
 
         val checkoutScreenName = ShoppingScreens.CheckoutScreen.name
@@ -117,6 +119,10 @@ fun ShoppingNavigation() {
 
         composable(ShoppingScreens.OrderPlacedScreen.name) {
             OrderPlacedScreen(navController = navController)
+        }
+
+        composable(ShoppingScreens.ProfileScreen.name) {
+            ProfileScreen(navController = navController)
         }
     }
 }

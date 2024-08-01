@@ -3,6 +3,7 @@ package com.example.ecommerce.di
 
 import com.example.ecommerce.network.ProductsApi
 import com.example.ecommerce.repository.FireRepository
+import com.example.ecommerce.repository.HistoryRepository
 import com.example.ecommerce.util.Constants
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -22,6 +23,12 @@ object AppModule {
     fun provideFireBookRepository()
             = FireRepository(queryProduct = FirebaseFirestore.getInstance()
         .collection("products"))
+
+    @Singleton
+    @Provides
+    fun provideHistoryRepository()
+            = HistoryRepository(queryHistory = FirebaseFirestore.getInstance()
+        .collection("order_history"))
 
     @Singleton
     @Provides

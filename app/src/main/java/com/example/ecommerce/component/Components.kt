@@ -51,6 +51,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -67,6 +68,7 @@ import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.ecommerce.R
 import com.example.ecommerce.navigation.ShoppingScreens
 import com.example.ecommerce.screen.home.HomeScreenViewModel
 
@@ -165,6 +167,7 @@ fun WeatherAppBar(
 fun ShoppingAppBar(
     title: String,
     icon: ImageVector? = null,
+    showProfile: Boolean = true,
     isMainScreen: Boolean = true,
     elevation: Dp = 0.dp,
     navController: NavController,
@@ -186,20 +189,20 @@ fun ShoppingAppBar(
     TopAppBar(
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                /*if (showProfile) {
+                if (showProfile) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_profile),
                             contentDescription = "Profile icon",
                             modifier = Modifier
                                 .clickable {
-                                    navController.navigate(ReaderScreens.ReaderStatsScreen.name)
+                                    navController.navigate(ShoppingScreens.ProfileScreen.name)
                                 }
                                 .size(45.dp),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                }*/
+                }
 
                 if (icon != null){
                     Icon(imageVector = icon, contentDescription = "arrow back",
