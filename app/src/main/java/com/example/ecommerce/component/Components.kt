@@ -70,6 +70,7 @@ import androidx.navigation.NavController
 import com.example.ecommerce.R
 import com.example.ecommerce.model.Product
 import com.example.ecommerce.navigation.ShoppingScreens
+import com.example.ecommerce.screen.cart.CartScreenViewModel
 import com.example.ecommerce.screen.home.HomeScreenViewModel
 import com.example.ecommerce.util.Constants
 import com.google.firebase.auth.FirebaseAuth
@@ -96,72 +97,6 @@ fun AppLogo(modifier: Modifier = Modifier) {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-fun WeatherAppBar(
-    title: String = "Title",
-    icon: ImageVector? = null,
-    isMainScreen: Boolean = true,
-    elevation: Dp = 0.dp,
-    navController: NavController = NavController(LocalContext.current),
-    onAddActionClicked: () -> Unit = {},
-    onButtonClicked: () -> Unit = {}
-) {
-    val showDialog = remember {
-        mutableStateOf(false)
-    }
-
-    TopAppBar(
-        modifier = Modifier
-            .shadow(elevation = elevation),
-        title = {
-            Text(
-                text = title,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                style = TextStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp
-                )
-            )
-        },
-        actions = {
-            if (isMainScreen) {
-                IconButton(onClick = {
-                    onAddActionClicked.invoke()
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "search icon"
-                    )
-                }
-                IconButton(onClick = {
-                    showDialog.value = true
-                }) {
-                    Icon(
-                        imageVector = Icons.Rounded.MoreVert,
-                        contentDescription = "more icon"
-                    )
-                }
-            } else {
-                Box {}
-            }
-        },
-        navigationIcon = {
-            if (icon != null) {
-                Icon(imageVector = icon,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                    modifier = Modifier
-                        .clickable {
-                            onButtonClicked.invoke()
-                        })
-            }
-
-        },
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShoppingAppBar(
     title: String,
@@ -170,10 +105,12 @@ fun ShoppingAppBar(
     isMainScreen: Boolean = true,
     elevation: Dp = 0.dp,
     navController: NavController,
-    viewModel: HomeScreenViewModel = hiltViewModel(),
+    viewModel: CartScreenViewModel = hiltViewModel(),
     onBackArrowClicked: () -> Unit = {}
 ) {
     val openDialog = remember { mutableStateOf(false) }
+    val listOfProducts: List<Product>
+    val currentUser = FirebaseAuth.getInstance().currentUser
 
     if (openDialog.value) {
         ShowAlertDialog(title = stringResource(id = R.string.logout_title), message = stringResource(id = R.string.logout_description)
@@ -184,6 +121,9 @@ fun ShoppingAppBar(
         }
     }
 
+    listOfProducts = viewModel.data.value.data!!.toList().filter { product ->
+        product.userId == currentUser?.uid.toString()
+    }
 
     TopAppBar(
         title = {
@@ -225,15 +165,10 @@ fun ShoppingAppBar(
             IconButton(onClick = {
                 navController.navigate(ShoppingScreens.ShoppingCartScreen.name)
             }) {
-                if (isMainScreen && viewModel.list.isNotEmpty()) Row {
+                if (isMainScreen && listOfProducts.isNotEmpty()) Row {
                     Icon(
                         imageVector = Icons.Rounded.ShoppingCart,
-                        contentDescription = "Logout icon",
-                    )
-                } else if (showProfile) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_logout),
-                        contentDescription = "Logout icon"
+                        contentDescription = "Cart icon",
                     )
                 }
             }

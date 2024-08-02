@@ -64,8 +64,8 @@ fun ShoppingHomeScreen(
     Scaffold(topBar = {
         ShoppingAppBar(
             title = "Shopping App",
-            navController = navController,
-            viewModel = viewModel)
+            navController = navController
+        )
     }) {
         //content
         Surface(modifier = Modifier

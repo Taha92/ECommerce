@@ -72,7 +72,8 @@ fun ShoppingCartScreen(
             icon = Icons.Default.ArrowBack,
             showProfile = false,
             isMainScreen = false,
-            navController = navController
+            navController = navController,
+            viewModel = viewModel
         ) {
             navController.popBackStack()
         }
@@ -94,7 +95,6 @@ fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
     var listOfProducts: List<Product>
     var totalPrice by remember { mutableStateOf(0.0) }
     val deletedItem = remember { mutableStateListOf<Product>() }
-    //val currentUser = FirebaseAuth.getInstance().currentUser
 
     if (viewModel.data.value.loading!!) {
         Column(modifier = Modifier
@@ -124,10 +124,10 @@ fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
                                 enter = expandVertically(),
                                 exit = shrinkVertically(animationSpec = tween(durationMillis = 1000))
                             ) {
-                                //totalPrice += product.priceWithDecimal!!.toDouble() * product.quantity!!.toDouble()
-                                //ProductRow(product, listOfProducts, deletedItem)
-                                ProductRow(product,
-                                    listOfProducts as MutableList<Product>, deletedItem) { updatedProducts ->
+                                ProductRow(
+                                    product,
+                                    deletedItem
+                                ) { updatedProducts ->
                                     listOfProducts = updatedProducts
                                     totalPrice = updatedProducts.filter { !deletedItem.contains(it) }
                                         .sumOf { it.priceWithDecimal!!.toDouble() * it.quantity!!.toDouble() }
@@ -159,13 +159,11 @@ fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
 @Composable
 fun ProductRow(
     product: Product,
-    listOfProducts: MutableList<Product>,
     deletedItem: SnapshotStateList<Product>,
     onProductListUpdated: (List<Product>) -> Unit
 ) {
     val context = LocalContext.current
     val productQuantity = rememberSaveable { mutableStateOf(product.quantity!!.toInt()) }
-    //val deletedItem = remember { mutableStateListOf<Product>() }
 
     Card(
         shape = RoundedCornerShape(29.dp),

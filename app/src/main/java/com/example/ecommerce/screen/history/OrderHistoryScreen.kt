@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -36,8 +35,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -52,6 +49,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.ecommerce.component.ShoppingAppBar
 import com.example.ecommerce.model.OrderHistoryItem
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun OrderHistoryScreen(
@@ -94,8 +92,8 @@ fun ExpandableCard(
     viewModel: OrderHistoryViewModel
 ) {
     val listOfOrders: List<OrderHistoryItem>
-
     val expandedStates = remember { mutableStateOf(mutableMapOf<Int, Boolean>()) }
+    val currentUser = FirebaseAuth.getInstance().currentUser
 
     if (viewModel.data.value.loading!!) {
         Column(modifier = Modifier
@@ -107,138 +105,140 @@ fun ExpandableCard(
             Text(text = "Loading...")
         }
     } else if (!viewModel.data.value.data.isNullOrEmpty()) {
-        /*listOfProducts = viewModel.data.value.data!!.toList().filter { mBook ->
-            mBook.userId == currentUser?.uid.toString()
-        }*/
-        listOfOrders = viewModel.data.value.data!!
+        //Check order history belongs to this user
+        listOfOrders = viewModel.data.value.data!!.toList().filter { order ->
+            order.userId == currentUser?.uid.toString()
+        }
 
-        LazyColumn {
-            itemsIndexed(items = listOfOrders) { index, product ->
-                val expandedState = expandedStates.value.getOrElse(index) { false }
-                val rotationState by animateFloatAsState(
-                    targetValue = if (expandedState) 180f else 0f
-                )
+        if (listOfOrders.isNotEmpty()) {
+            LazyColumn {
+                itemsIndexed(items = listOfOrders) { index, product ->
+                    val expandedState = expandedStates.value.getOrElse(index) { false }
+                    val rotationState by animateFloatAsState(
+                        targetValue = if (expandedState) 180f else 0f
+                    )
 
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp)
-                        .animateContentSize(
-                            animationSpec = tween(
-                                durationMillis = 300,
-                                easing = LinearOutSlowInEasing
-                            )
-                        ),
-                    onClick = {
-                        // Update expanded state for the clicked card
-                        expandedStates.value = expandedStates.value.toMutableMap().apply {
-                            this[index] = !expandedState
-                        }
-                    }
-                ) {
-                    // card content
-                    Column(
+                    Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(22.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(6f)
-                            ) {
-                                Text(
-                                    modifier = Modifier
-                                        .padding(2.dp),
-                                    text = "Order ID: ${product.orderId}",
-                                    fontSize = titleFontSize,
-                                    fontWeight = titleFontWeight,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                            .padding(bottom = 8.dp)
+                            .animateContentSize(
+                                animationSpec = tween(
+                                    durationMillis = 300,
+                                    easing = LinearOutSlowInEasing
                                 )
-                                Text(modifier = Modifier
-                                    .padding(2.dp),
-                                    text = "Date: ${product.date}",
-                                    //fontSize = 14.sp,
-                                    fontWeight = titleFontWeight,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                Text(modifier = Modifier
-                                    .padding(2.dp),
-                                    text = "Total: ₺${product.totalBill}",
-                                    //fontSize = 14.sp,
-                                    fontWeight = titleFontWeight,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
-                            IconButton(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .alpha(0.2f)
-                                    .rotate(rotationState),
-                                onClick = {
-                                    // Update expanded state for the clicked card
-                                    expandedStates.value = expandedStates.value.toMutableMap().apply {
-                                        this[index] = !expandedState
-                                    }
-                                }) {
-                                Icon(
-                                    imageVector = Icons.Default.ArrowDropDown,
-                                    contentDescription = "Drop-Down Arrow",
-                                    tint = Color.Black,
-                                )
+                            ),
+                        onClick = {
+                            // Update expanded state for the clicked card
+                            expandedStates.value = expandedStates.value.toMutableMap().apply {
+                                this[index] = !expandedState
                             }
                         }
-
-                        if (expandedState) {
-                            for (item in product.products!!) {
-
-                                Divider(modifier = Modifier.padding(top = 8.dp))
-
-                                Row(modifier = Modifier
+                    ) {
+                        // card content
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(22.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(6.dp),
-                                    verticalAlignment = Alignment.CenterVertically
+                                    .weight(6f)
                                 ) {
-                                    Card(
-                                        shape = RoundedCornerShape(9.dp),
-                                        colors = CardDefaults.cardColors(containerColor = Color.White),
-                                        border = BorderStroke(2.dp, color = Color.LightGray)
-                                    ) {
-                                        Image(
-                                            painter = rememberImagePainter(data = item.image),
-                                            contentDescription = "Product image",
-                                            modifier = Modifier
-                                                .width(96.dp)
-                                                .heightIn(100.dp)
-                                                .padding(end = 4.dp),
-                                        )
-                                    }
+                                    Text(
+                                        modifier = Modifier
+                                            .padding(2.dp),
+                                        text = "Order ID: ${product.orderId}",
+                                        fontSize = titleFontSize,
+                                        fontWeight = titleFontWeight,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Text(modifier = Modifier
+                                        .padding(2.dp),
+                                        text = "Date: ${product.date}",
+                                        //fontSize = 14.sp,
+                                        fontWeight = titleFontWeight,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Text(modifier = Modifier
+                                        .padding(2.dp),
+                                        text = "Total: ₺${product.totalBill}",
+                                        //fontSize = 14.sp,
+                                        fontWeight = titleFontWeight,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                                IconButton(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .alpha(0.2f)
+                                        .rotate(rotationState),
+                                    onClick = {
+                                        // Update expanded state for the clicked card
+                                        expandedStates.value = expandedStates.value.toMutableMap().apply {
+                                            this[index] = !expandedState
+                                        }
+                                    }) {
+                                    Icon(
+                                        imageVector = Icons.Default.ArrowDropDown,
+                                        contentDescription = "Drop-Down Arrow",
+                                        tint = Color.Black,
+                                    )
+                                }
+                            }
 
-                                    Column(modifier = Modifier
-                                        .padding(start = 16.dp, top = 6.dp)
-                                        .fillMaxWidth(),
-                                        verticalArrangement = Arrangement.Center
+                            if (expandedState) {
+                                for (item in product.products!!) {
+
+                                    Divider(modifier = Modifier.padding(top = 8.dp))
+
+                                    Row(modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(6.dp),
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text(
-                                            text = item.name.toString(),
-                                            style = MaterialTheme.typography.titleMedium,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Text(
-                                            text = "Quantity: ${item.quantity.toString()}",
-                                            style = MaterialTheme.typography.titleMedium,
+                                        Card(
+                                            shape = RoundedCornerShape(9.dp),
+                                            colors = CardDefaults.cardColors(containerColor = Color.White),
+                                            border = BorderStroke(2.dp, color = Color.LightGray)
+                                        ) {
+                                            Image(
+                                                painter = rememberImagePainter(data = item.image),
+                                                contentDescription = "Product image",
+                                                modifier = Modifier
+                                                    .width(96.dp)
+                                                    .heightIn(100.dp)
+                                                    .padding(end = 4.dp),
                                             )
-                                        Text(
-                                            text = "Price: ${item.priceWithDecimal}",
-                                            style = MaterialTheme.typography.titleMedium,
+                                        }
+
+                                        Column(modifier = Modifier
+                                            .padding(start = 16.dp, top = 6.dp)
+                                            .fillMaxWidth(),
+                                            verticalArrangement = Arrangement.Center
+                                        ) {
+                                            Text(
+                                                text = item.name.toString(),
+                                                style = MaterialTheme.typography.titleMedium,
+                                                fontWeight = FontWeight.Bold
                                             )
+                                            Text(
+                                                text = "Quantity: ${item.quantity.toString()}",
+                                                style = MaterialTheme.typography.titleMedium,
+                                            )
+                                            Text(
+                                                text = "Price: ${item.priceWithDecimal}",
+                                                style = MaterialTheme.typography.titleMedium,
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -246,14 +246,21 @@ fun ExpandableCard(
                     }
                 }
             }
+        } else {
+            NoPreviousOrder()
         }
     } else {
-        Column(modifier = Modifier
-            .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "No previous orders...")
-        }
+        NoPreviousOrder()
+    }
+}
+
+@Composable
+fun NoPreviousOrder() {
+    Column(modifier = Modifier
+        .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "No previous orders...")
     }
 }
