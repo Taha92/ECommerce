@@ -1,6 +1,8 @@
 package com.example.ecommerce.screen.otp
 
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -73,6 +76,7 @@ fun PaymentContent(navController: NavController, totalBill: String, viewModel: C
     var otpValue by remember { mutableStateOf("") }
     val orderId by remember { mutableStateOf(0) }
     var loading by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     val paymentSDK: PaymentInterface = Payment()
 
@@ -81,7 +85,10 @@ fun PaymentContent(navController: NavController, totalBill: String, viewModel: C
     }
 
     if (loading) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             CircularProgressIndicator()
             Text(text = "Loading...")
         }
@@ -140,6 +147,7 @@ fun PaymentContent(navController: NavController, totalBill: String, viewModel: C
                     override fun onFailure(error: String?) {
                         // Handle failure
                         loading = false
+                        Toast.makeText(context, error.toString(), Toast.LENGTH_SHORT).show()
                         Log.e("confirmPayment", error!!)
                     }
                 })

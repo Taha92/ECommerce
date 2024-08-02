@@ -357,10 +357,12 @@ fun OtpTextField(
         decorationBox = {
             Row(horizontalArrangement = Arrangement.Center) {
                 repeat(otpCount) { index ->
-                    CharView(
-                        index = index,
-                        text = otpText
-                    )
+                    Box(modifier = Modifier.weight(1f)) {
+                        CharView(
+                            index = index,
+                            text = otpText
+                        )
+                    }
                     Spacer(modifier = Modifier.width(8.dp))
                 }
             }
@@ -382,13 +384,14 @@ private fun CharView(
     Text(
         modifier = Modifier
             .width(46.dp)
+            //.height(52.dp)
             .border(
                 2.dp, when {
                     isFocused -> Color(0xFF92CBDF)
                     else -> Color.LightGray
                 }, RoundedCornerShape(8.dp)
             )
-            .padding(22.dp),
+            .padding(16.dp),
         text = char,
         style = MaterialTheme.typography.titleLarge,
         color = if (isFocused) {
