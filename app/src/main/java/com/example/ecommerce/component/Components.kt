@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -303,7 +304,7 @@ fun RoundedSubmitButton(
     validInputs: Boolean = true,
     onClick: () -> Unit = {}
 ) {
-    Box(modifier = Modifier.padding(16.dp)) {
+    Box(modifier = Modifier.padding(10.dp)) {
         Button(
             onClick = onClick,
             modifier = Modifier
@@ -323,43 +324,6 @@ fun RoundedSubmitButton(
         ) {
             /*if (loading) CircularProgressIndicator(modifier = Modifier.size(25.dp))
             else */Text(text = label, modifier = Modifier.padding(5.dp))
-        }
-    }
-}
-
-@Composable
-fun RoundedButton(
-    label: String = "Continue",
-    radius: Int = 29,
-    enabled: Boolean = false,
-    onPress: () -> Unit = {}
-) {
-    Surface(modifier = Modifier
-        .padding(16.dp)
-        .clip(
-            RoundedCornerShape(
-                bottomEndPercent = radius,
-                bottomStartPercent = radius,
-                topStartPercent = radius,
-                topEndPercent = radius
-            )
-        ),
-        color = Color(0xFF92CBDF)
-    ) {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(60.dp)
-            .clickable { onPress.invoke() },
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = label,
-                style = TextStyle(
-                    color = Color.White,
-                    fontSize = 15.sp
-                )
-            )
         }
     }
 }

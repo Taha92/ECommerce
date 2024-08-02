@@ -66,7 +66,7 @@ fun CardDetailScreen(
     }) {
         //content
         Surface(modifier = Modifier
-            .padding(top = it.calculateTopPadding())
+            .padding(top = it.calculateTopPadding(), bottom = it.calculateBottomPadding())
             .fillMaxSize()
         ) {
             //card content

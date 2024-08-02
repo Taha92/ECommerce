@@ -1,7 +1,6 @@
 package com.example.ecommerce.screen.detail
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,13 +23,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.text.trimmedLength
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
-import com.example.ecommerce.component.RoundedButton
+import com.example.ecommerce.component.RoundedSubmitButton
 import com.example.ecommerce.component.ShoppingAppBar
 import com.example.ecommerce.component.performDatabaseOperation
 import com.example.ecommerce.model.Product
@@ -55,7 +52,7 @@ fun ItemDetailScreen(
     }) {
         //content
         Surface(modifier = Modifier
-            .padding(top = it.calculateTopPadding())
+            .padding(top = it.calculateTopPadding(), bottom = it.calculateBottomPadding())
             .fillMaxSize()
         ) {
             //item content
@@ -116,7 +113,7 @@ fun ItemDetailContent(product: ProductXX) {
         }
 
         Box(modifier = Modifier.weight(0.1f)) {
-            RoundedButton(label = "Add to Cart") {
+            RoundedSubmitButton(label = "Add to Cart") {
                 //Save product to firestore
                 val mProduct = Product(
                     name = product.name,

@@ -29,6 +29,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -49,13 +50,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.ecommerce.R
+import com.example.ecommerce.component.RoundedSubmitButton
 import com.example.ecommerce.component.ShoppingAppBar
-import com.example.ecommerce.component.RoundedButton
 import com.example.ecommerce.component.deleteProductFromDatabase
 import com.example.ecommerce.component.performDatabaseOperation
 import com.example.ecommerce.model.Product
@@ -80,7 +80,7 @@ fun ShoppingCartScreen(
     }) {
         //content
         Surface(modifier = Modifier
-            .padding(top = it.calculateTopPadding())
+            .padding(top = it.calculateTopPadding(), bottom = it.calculateBottomPadding())
             .fillMaxSize()
         ) {
             //cart content
@@ -114,7 +114,7 @@ fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
         Column {
             Box(modifier = Modifier.weight(0.8f)) {
                 LazyColumn(
-                    contentPadding = PaddingValues(16.dp)
+                    contentPadding = PaddingValues(10.dp)
                 ) {
                     items(
                         items = listOfProducts,
@@ -138,8 +138,10 @@ fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
                 }
             }
 
-            Box(modifier = Modifier.weight(0.1f)) {
-                RoundedButton {
+            Box(modifier = Modifier
+                .weight(0.1f)
+            ) {
+                RoundedSubmitButton {
                     navController.navigate(ShoppingScreens.CardDetailScreen.name + "/${totalPrice}")
                 }
             }
@@ -202,14 +204,14 @@ fun ProductRow(
                         .padding(start = 16.dp)
                 )
                 Text(
-                    text = "${product.shortDescription}",
+                    text = if (product.shortDescription == null) "Description" else "${product.shortDescription}",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
                         .padding(start = 16.dp)
                 )
                 Text(
-                    text = "${product.price}",
+                    text = "₺${product.priceWithDecimal}",
                     modifier = Modifier
                         .padding(start = 16.dp)
                 )
@@ -244,7 +246,7 @@ fun ProductRow(
 
                     Text(
                         text = productQuantity.value.toString(),
-                        fontSize = 16.sp,
+                        style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier
                             .padding(top = 16.dp)
                     )
