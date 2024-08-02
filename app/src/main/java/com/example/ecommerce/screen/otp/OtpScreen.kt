@@ -1,11 +1,13 @@
 package com.example.ecommerce.screen.otp
 
 import android.util.Log
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -37,7 +39,6 @@ import com.example.paymentsdk.Payment
 import com.example.paymentsdk.PaymentCallback
 import com.example.paymentsdk.PaymentInterface
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -47,9 +48,13 @@ import java.util.Date
 fun OtpScreen(navController: NavHostController, totalBill: String, cartViewModel: CartScreenViewModel) {
     Scaffold(topBar = {
         ShoppingAppBar(title = "Payment",
+            icon = Icons.Default.ArrowBack, // need to remove this
             isMainScreen = false,
+            showProfile = false,
             navController = navController
-        )
+        ) {
+            navController.popBackStack()
+        }
     }) {
         //content
         Surface(modifier = Modifier
@@ -69,6 +74,7 @@ fun PaymentContent(navController: NavController, totalBill: String, viewModel: C
     val currentDateAndTime = sdf.format(Date())
     var otpValue by remember { mutableStateOf("") }
     val orderId by remember { mutableStateOf(0) }
+    var loading by remember { mutableStateOf(false) }
 
     val paymentSDK: PaymentInterface = Payment()
 
@@ -76,76 +82,86 @@ fun PaymentContent(navController: NavController, totalBill: String, viewModel: C
         listOfProducts = viewModel.data.value.data!!.toList()
     }
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(top = 26.dp, start = 16.dp, end = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Enter One Time Password",
-            style = MaterialTheme.typography.titleLarge)
-
-        Text(modifier = Modifier
-            .padding(top = 26.dp),
-            text = "Please enter the the 6-digit verification code sent to your phone number.",
-            style = MaterialTheme.typography.titleMedium,
-            textAlign = TextAlign.Center
-        )
-
-        OtpTextField(modifier = Modifier
-            .padding(top = 26.dp),
-            otpText = otpValue,
-            onOtpTextChange = { value, otpInputFilled ->
-                otpValue = value
-            }
-        ) {
-            Log.d("TAG", "PaymentContent: Otp entered")
-            //show loader first
-
-
-            // Confirm payment
-            paymentSDK.confirmPayment("123456", object : PaymentCallback {
-                override fun onSuccess(message: String?) {
-                    // Handle success
-                    Log.d("confirmPayment", message!!)
-                    val products = OrderHistoryItem(
-                        orderId = (orderId+1).toString(),
-                        userId = FirebaseAuth.getInstance().currentUser?.uid.toString(),
-                        products = listOfProducts,
-                        date = currentDateAndTime,
-                        totalBill = totalBill
-                    )
-                    saveOrderHistoryInDatabase(products)
-
-                    /*for (product in listOfProducts) {
-                        deleteProductFromDatabase(product)
-                    }*/
-
-                    //Go to order placed screen
-                    navController.navigate(ShoppingScreens.OrderPlacedScreen.name)
-                }
-
-                override fun onFailure(error: String?) {
-                    // Handle failure
-                    Log.e("confirmPayment", error!!)
-                }
-            })
+    if (loading) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+            Text(text = "Loading...")
         }
+    } else {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 26.dp, start = 16.dp, end = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Enter One Time Password",
+                style = MaterialTheme.typography.titleLarge)
 
-        Text(modifier = Modifier
-            .padding(top = 8.dp),
-            text = buildAnnotatedString {
-                append("Didn't receive the code? ")
+            Text(modifier = Modifier
+                .padding(top = 26.dp),
+                text = "Please enter the the 6-digit verification code sent to your phone number.",
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center
+            )
 
-            withStyle(
-                SpanStyle(
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Red.copy(alpha = 0.5f)
-                )
+            OtpTextField(modifier = Modifier
+                .padding(top = 26.dp),
+                otpText = otpValue,
+                onOtpTextChange = { value, otpInputFilled ->
+                    otpValue = value
+                }
             ) {
-                append("Resend")
+                //show loader first
+                loading = true
+
+                // Confirm payment
+                paymentSDK.confirmPayment(otpValue, object : PaymentCallback {
+                    override fun onSuccess(message: String?) {
+                        // Handle success
+                        loading = false
+                        Log.d("confirmPayment", message!!)
+                        val products = OrderHistoryItem(
+                            orderId = (orderId+1).toString(),
+                            userId = FirebaseAuth.getInstance().currentUser?.uid.toString(),
+                            products = listOfProducts,
+                            date = currentDateAndTime,
+                            totalBill = totalBill
+                        )
+                        //Save order for history
+                        saveOrderHistoryInDatabase(products)
+
+                        //Empty cart
+                        for (product in listOfProducts) {
+                            deleteProductFromDatabase(product)
+                        }
+
+                        //Go to order placed screen
+                        navController.navigate(ShoppingScreens.OrderPlacedScreen.name)
+                    }
+
+                    override fun onFailure(error: String?) {
+                        // Handle failure
+                        loading = false
+                        Log.e("confirmPayment", error!!)
+                    }
+                })
             }
-        })
+
+            Text(modifier = Modifier
+                .padding(top = 8.dp),
+                text = buildAnnotatedString {
+                    append("Didn't receive the code? ")
+
+                    withStyle(
+                        SpanStyle(
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.Red.copy(alpha = 0.5f)
+                        )
+                    ) {
+                        append("Resend")
+                    }
+                })
+        }
     }
 }
 

@@ -22,7 +22,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.ShoppingCart
 import androidx.compose.material3.Button
@@ -559,11 +558,17 @@ fun updateProductInDatabase(
         (document.data["quantity"] as String).toInt() - 1
     }
 
+    val toastMessage = if (operation.equals("Add", true)) {
+        "Added"
+    } else {
+        "Removed"
+    }
+
     dbCollection.document(document.id)
         .update(hashMapOf("quantity" to increment.toString()) as Map<String, Any>)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                Toast.makeText(context, "Item Added!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Item ${toastMessage}!", Toast.LENGTH_SHORT).show()
                 Log.d("Success", "SaveToFirebase: Updated Successfully!")
             }
         }

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -23,6 +24,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -36,7 +41,6 @@ import com.example.ecommerce.R
 import com.example.ecommerce.component.RoundedSubmitButton
 import com.example.ecommerce.component.ShoppingAppBar
 import com.example.ecommerce.model.CardInfo
-import com.example.ecommerce.model.Product
 import com.example.ecommerce.navigation.ShoppingScreens
 import com.example.paymentsdk.Payment
 import com.example.paymentsdk.PaymentCallback
@@ -78,134 +82,149 @@ fun CheckoutContent(
 ) {
     val totalPayable = (totalPrice.toDouble() * 10) / 100
     val formattedTotal = String.format("%.2f", totalPrice.toDouble() - totalPayable)
+    var loading by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier
         .fillMaxSize()
     ) {
-        Column(modifier = Modifier.weight(0.8f)) {
-            Row(
-                modifier = Modifier
-                    .padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 16.dp)
-                    .height(70.dp)
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Surface(modifier = Modifier
-                    .weight(0.3f),
-                    shape = CircleShape,
-                    color = Color.White,
-                    border = BorderStroke(2.dp, color = Color.LightGray)
+        if (loading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+                Text(text = "Loading...")
+            }
+        } else {
+            Column(modifier = Modifier.weight(0.8f)) {
+                Row(
+                    modifier = Modifier
+                        .padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 16.dp)
+                        .height(70.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Image(
-                        painter = painterResource(id = R.mipmap.visa_card),
-                        contentDescription = "Visa card icon",
-                    )
-                }
-
-                Column(modifier = Modifier
-                    .weight(0.7f)
-                    .padding(start = 6.dp)
-                ) {
-                    Text(
-                        text = cardInfo.holderName.toString(),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-
-                    Text(
-                        text = "************${cardInfo.holderNumber.toString().takeLast(4)}"
-                    )
-                }
-
-                OutlinedButton(
-                    onClick = {
-                        navController.navigate(ShoppingScreens.CardDetailScreen.name + "/${totalPrice}")
-                        //navController.navigate(ShoppingScreens.CardDetailScreen.name)
+                    Surface(modifier = Modifier
+                        .weight(0.3f),
+                        shape = CircleShape,
+                        color = Color.White,
+                        border = BorderStroke(2.dp, color = Color.LightGray)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.mipmap.visa_card),
+                            contentDescription = "Visa card icon",
+                        )
                     }
+
+                    Column(modifier = Modifier
+                        .weight(0.7f)
+                        .padding(start = 6.dp)
+                    ) {
+                        Text(
+                            text = cardInfo.holderName.toString(),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+
+                        Text(
+                            text = "************${cardInfo.holderNumber.toString().takeLast(4)}"
+                        )
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            navController.navigate(ShoppingScreens.CardDetailScreen.name + "/${totalPrice}")
+                            //navController.navigate(ShoppingScreens.CardDetailScreen.name)
+                        }
+                    ) {
+                        Text(text = "Change card")
+                    }
+                }
+
+                Divider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
+
+                Row(modifier = Modifier
+                    .padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 16.dp)
                 ) {
-                    Text(text = "Change card")
+                    Text(
+                        text = "Total",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(0.9f)
+                    )
+                    Text(
+                        text = String.format("₺%.2f", totalPrice.toDouble()),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+
+                Divider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
+
+                Row(modifier = Modifier
+                    .padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 16.dp)
+                ) {
+                    Text(
+                        text = "Home Delivery",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(0.9f)
+                    )
+                    Text(
+                        text = "Free",
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+
+                Divider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
+
+                Row(modifier = Modifier
+                    .padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 16.dp)
+                ) {
+                    Text(
+                        text = "Discount",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(0.9f)
+                    )
+                    Text(
+                        text = "10%",
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+
+                Divider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
+
+                Row(modifier = Modifier
+                    .padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 16.dp)
+                ) {
+                    Text(
+                        text = "Total Payable",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.weight(0.9f),
+                        color = Color.Red.copy(alpha = 0.5f)
+                    )
+                    Text(
+                        text = "₺${formattedTotal}",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Color.Red.copy(alpha = 0.5f)
+                    )
                 }
             }
 
-            Divider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
-
-            Row(modifier = Modifier
-                .padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 16.dp)
-            ) {
-                Text(
-                    text = "Total",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.weight(0.9f)
-                )
-                Text(
-                    text = String.format("₺%.2f", totalPrice.toDouble()),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
-
-            Divider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
-
-            Row(modifier = Modifier
-                .padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 16.dp)
-            ) {
-                Text(
-                    text = "Home Delivery",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.weight(0.9f)
-                )
-                Text(
-                    text = "Free",
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
-
-            Divider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
-
-            Row(modifier = Modifier
-                .padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 16.dp)
-            ) {
-                Text(
-                    text = "Discount",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.weight(0.9f)
-                )
-                Text(
-                    text = "10%",
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
-
-            Divider(modifier = Modifier.padding(start = 8.dp, end = 8.dp))
-
-            Row(modifier = Modifier
-                .padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 16.dp)
-            ) {
-                Text(
-                    text = "Total Payable",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.weight(0.9f),
-                    color = Color.Red.copy(alpha = 0.5f)
-                )
-                Text(
-                    text = "₺${formattedTotal}",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = Color.Red.copy(alpha = 0.5f)
-                )
+            Box(modifier = Modifier.weight(0.1f)) {
+                RoundedSubmitButton(label = "Order and Pay") {
+                    startPaymentProcess(navController, cardInfo, formattedTotal.toDouble()) { loading = true }
+                }
             }
         }
 
-        Box(modifier = Modifier.weight(0.1f)) {
-            RoundedSubmitButton(label = "Order and Pay") {
-                //navController.navigate(ShoppingScreens.CardDetailScreen.name)
-                startPaymentProcess(navController, cardInfo, formattedTotal.toDouble())
-            }
-        }
     }
 }
 
-fun startPaymentProcess(navController: NavController, cardInfo: CardInfo, totalPayable: Double) {
+fun startPaymentProcess(
+    navController: NavController,
+    cardInfo: CardInfo,
+    totalPayable: Double,
+    onLoadingChanged: (Boolean) -> Unit
+) {
     val paymentSDK: PaymentInterface = Payment()
+
+    onLoadingChanged(true)
 
     //start payment
     paymentSDK.startPayment(
@@ -216,6 +235,7 @@ fun startPaymentProcess(navController: NavController, cardInfo: CardInfo, totalP
         object : PaymentCallback {
             override fun onSuccess(message: String?) {
                 // Handle success, prompt user to enter OTP
+                onLoadingChanged(false)
                 Log.d("Payment", message!!)
                 navController.navigate(ShoppingScreens.OtpScreen.name + "/${totalPayable}")
                 //navController.navigate(ShoppingScreens.OtpScreen.name)
@@ -223,6 +243,7 @@ fun startPaymentProcess(navController: NavController, cardInfo: CardInfo, totalP
 
             override fun onFailure(error: String?) {
                 // Handle failure
+                onLoadingChanged(false)
                 Log.e("Payment", error!!)
             }
         })

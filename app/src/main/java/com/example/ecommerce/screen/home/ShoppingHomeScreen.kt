@@ -27,9 +27,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -48,6 +53,7 @@ import com.example.ecommerce.model.ProductXX
 import com.example.ecommerce.navigation.ShoppingScreens
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
+import kotlinx.coroutines.delay
 
 
 @Composable
@@ -133,7 +139,7 @@ private fun ProductsGridView(product: ProductXX, navController: NavController) {
                 )
 
                 Text(
-                    text = "₺${product.price}",
+                    text = String.format("₺%.2f", product.price),
                     textAlign = TextAlign.Center
                 )
                 Text(
@@ -173,69 +179,8 @@ private fun ProductsGridView(product: ProductXX, navController: NavController) {
         ) {
             Icon(
                 imageVector = Icons.Outlined.Add,
-                contentDescription = "",
+                contentDescription = "Add icon",
             )
         }
     }
 }
-
-/*fun performDatabaseOperation(product: Product) {
-
-    val db = FirebaseFirestore.getInstance()
-    val dbCollection = db.collection("products")
-    val query = dbCollection.whereEqualTo("name", product.name.toString())
-
-    query.get().addOnSuccessListener { snapshot ->
-        if (snapshot.size() > 0) {
-            for (document in snapshot) {
-                if (document.exists()) {
-                    //Update quantity
-                    updateProductInDatabase(dbCollection, document)
-                } else {
-                    //Save new item
-                    saveProductInDatabase(product, dbCollection)
-                }
-            }
-        } else {
-            //Log.e("TAG", "performDatabaseOperation: ", )
-            saveProductInDatabase(product, dbCollection)
-        }
-    }
-}
-
-fun saveProductInDatabase(product: Product, dbCollection: CollectionReference) {
-    if (product.toString().isNotEmpty()) {
-        dbCollection.add(product)
-            .addOnSuccessListener { documentRef ->
-                val docId = documentRef.id
-                dbCollection.document(docId)
-                    .update(hashMapOf("id" to docId) as Map<String, Any>)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Log.d("Success", "SaveToFirebase: Saved Successfully!")
-                            //navController.popBackStack()
-                        }
-                    }
-                    .addOnFailureListener {
-                        Log.d("Error", "SaveToFirebase: Error updating doc")
-                    }
-            }
-    }
-}
-
-fun updateProductInDatabase(
-    dbCollection: CollectionReference,
-    document: QueryDocumentSnapshot
-) {
-    val increment = (document.data["quantity"] as String).toInt() + 1
-    dbCollection.document(document.id)
-        .update(hashMapOf("quantity" to increment.toString()) as Map<String, Any>)
-        .addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d("Success", "SaveToFirebase: Updated Successfully!")
-            }
-        }
-        .addOnFailureListener {
-            Log.d("Error", "SaveToFirebase: Error updating doc")
-        }
-}*/

@@ -11,6 +11,6 @@ data class ProductXX(
     val name: String,
     val price: Double,
     val priceText: String = "",
-    val shortDescription: String = "",
+    val shortDescription: String = "Description",
     val thumbnailURL: String = ""
 ) : java.io.Serializable

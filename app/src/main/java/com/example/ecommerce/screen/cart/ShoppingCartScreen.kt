@@ -33,10 +33,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -89,8 +91,8 @@ fun ShoppingCartScreen(
 
 @Composable
 fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
-    val listOfProducts: MutableList<Product>
-    var totalPrice = 0.0
+    var listOfProducts: List<Product>
+    var totalPrice by remember { mutableStateOf(0.0) }
     val deletedItem = remember { mutableStateListOf<Product>() }
     //val currentUser = FirebaseAuth.getInstance().currentUser
 
@@ -106,15 +108,14 @@ fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
     } else if (!viewModel.data.value.data.isNullOrEmpty()) {
         listOfProducts = viewModel.data.value.data!!.toMutableList()
 
+        totalPrice = listOfProducts.filter { !deletedItem.contains(it) }
+            .sumOf { it.priceWithDecimal!!.toDouble() * it.quantity!!.toDouble() }
+
         Column {
             Box(modifier = Modifier.weight(0.8f)) {
                 LazyColumn(
                     contentPadding = PaddingValues(16.dp)
                 ) {
-                    /*items(items = listOfProducts) { product ->
-                        totalPrice += product.priceWithDecimal!!.toDouble() * product.quantity!!.toDouble()
-                        ProductRow(product, listOfProducts)
-                    }*/
                     items(
                         items = listOfProducts,
                         itemContent = {product ->
@@ -123,8 +124,14 @@ fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
                                 enter = expandVertically(),
                                 exit = shrinkVertically(animationSpec = tween(durationMillis = 1000))
                             ) {
-                                totalPrice += product.priceWithDecimal!!.toDouble() * product.quantity!!.toDouble()
-                                ProductRow(product, listOfProducts, deletedItem)
+                                //totalPrice += product.priceWithDecimal!!.toDouble() * product.quantity!!.toDouble()
+                                //ProductRow(product, listOfProducts, deletedItem)
+                                ProductRow(product,
+                                    listOfProducts as MutableList<Product>, deletedItem) { updatedProducts ->
+                                    listOfProducts = updatedProducts
+                                    totalPrice = updatedProducts.filter { !deletedItem.contains(it) }
+                                        .sumOf { it.priceWithDecimal!!.toDouble() * it.quantity!!.toDouble() }
+                                }
                             }
                         }
                     )
@@ -154,7 +161,8 @@ fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
 fun ProductRow(
     product: Product,
     listOfProducts: MutableList<Product>,
-    deletedItem: SnapshotStateList<Product>
+    deletedItem: SnapshotStateList<Product>,
+    onProductListUpdated: (List<Product>) -> Unit
 ) {
     val context = LocalContext.current
     val productQuantity = rememberSaveable { mutableStateOf(product.quantity!!.toInt()) }
