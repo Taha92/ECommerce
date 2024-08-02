@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.ShoppingCart
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -49,6 +51,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -69,6 +72,7 @@ import com.example.ecommerce.model.Product
 import com.example.ecommerce.navigation.ShoppingScreens
 import com.example.ecommerce.screen.home.HomeScreenViewModel
 import com.example.ecommerce.util.Constants
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
@@ -106,12 +110,6 @@ fun WeatherAppBar(
     val showDialog = remember {
         mutableStateOf(false)
     }
-
-    val showIt = remember {
-        mutableStateOf(false)
-    }
-
-    val context = LocalContext.current
 
     TopAppBar(
         modifier = Modifier
@@ -177,14 +175,14 @@ fun ShoppingAppBar(
 ) {
     val openDialog = remember { mutableStateOf(false) }
 
-   /* if (openDialog.value) {
+    if (openDialog.value) {
         ShowAlertDialog(title = stringResource(id = R.string.logout_title), message = stringResource(id = R.string.logout_description)
             , openDialog) {
             FirebaseAuth.getInstance().signOut().run {
-                navController.navigate(ReaderScreens.LoginScreen.name)
+                navController.navigate(ShoppingScreens.LoginScreen.name)
             }
         }
-    }*/
+    }
 
 
     TopAppBar(
@@ -225,27 +223,29 @@ fun ShoppingAppBar(
         },
         actions = {
             IconButton(onClick = {
-                //openDialog.value = true
-                /*FirebaseAuth.getInstance().signOut().run {
-                    navController.navigate(ReaderScreens.LoginScreen.name)
-                }*/
                 navController.navigate(ShoppingScreens.ShoppingCartScreen.name)
             }) {
                 if (isMainScreen && viewModel.list.isNotEmpty()) Row {
                     Icon(
                         imageVector = Icons.Rounded.ShoppingCart,
                         contentDescription = "Logout icon",
-                        tint = Color.Red.copy(alpha = 0.7f),
                     )
-                } else {
-                    /*IconButton(onClick = {
+                } else if (showProfile) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_logout),
+                        contentDescription = "Logout icon"
+                    )
+                }
+            }
 
-                    }) {
-                        Icon(
-                            imageVector = Icons.Rounded.Delete,
-                            contentDescription = "Empty cart icon",
-                        )
-                    }*/
+            IconButton(onClick = {
+                openDialog.value = true
+            }) {
+                if (showProfile) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_logout),
+                        contentDescription = "Logout icon"
+                    )
                 }
             }
         },
@@ -593,4 +593,28 @@ fun deleteProductFromDatabase(product: Product) {
                 //navController.navigate(ReaderScreens.ReaderHomeScreen.name)
             }
         }
+}
+
+@Composable
+fun ShowAlertDialog(
+    title: String,
+    message: String,
+    openDialog: MutableState<Boolean>,
+    onYesPressed: () -> Unit
+) {
+    if (openDialog.value) {
+        AlertDialog(
+            title = { Text(text = title) },
+            text = { Text(text = message) },
+            onDismissRequest = { openDialog.value = false },
+            confirmButton = {
+                TextButton(onClick = { onYesPressed.invoke() }) {
+                    Text(text = "Yes")
+                } },
+            dismissButton = {
+                TextButton(onClick = { openDialog.value = false }) {
+                    Text(text = "No")
+                }
+            },)
+    }
 }
