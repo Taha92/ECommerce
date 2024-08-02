@@ -1,19 +1,19 @@
 package com.example.ecommerce.screen.profile
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.sharp.Email
 import androidx.compose.material.icons.sharp.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -23,21 +23,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.ecommerce.component.ShoppingAppBar
-import com.example.ecommerce.model.OrderHistoryItem
-import com.example.ecommerce.model.Product
 import com.example.ecommerce.navigation.ShoppingScreens
-import com.example.ecommerce.screen.cart.CartScreenViewModel
 import com.google.firebase.auth.FirebaseAuth
 import java.util.Locale
 
@@ -46,9 +41,13 @@ import java.util.Locale
 fun ProfileScreen(navController: NavController = NavController(LocalContext.current)) {
     Scaffold(topBar = {
         ShoppingAppBar(title = "Profile",
+            icon = Icons.Default.ArrowBack,
+            showProfile = false,
             isMainScreen = false,
             navController = navController
-        )
+        ) {
+            navController.popBackStack()
+        }
     }) {
         //content
         Surface(modifier = Modifier
@@ -66,8 +65,7 @@ fun ProfileScreen(navController: NavController = NavController(LocalContext.curr
 fun ProfileContent(navController: NavController = NavController(LocalContext.current)) {
     val currentUser = FirebaseAuth.getInstance().currentUser
 
-    Column(
-    ) {
+    Column {
         Card(
             shape = RoundedCornerShape(2.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -75,7 +73,6 @@ fun ProfileContent(navController: NavController = NavController(LocalContext.cur
             modifier = Modifier
                 .padding(4.dp)
                 .fillMaxWidth()
-
         ) {
             Row(modifier = Modifier
                 .padding(16.dp)
@@ -133,7 +130,10 @@ fun ProfileContent(navController: NavController = NavController(LocalContext.cur
 
             Row(modifier = Modifier
                 .padding(16.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .clickable {
+                           navController.navigate(ShoppingScreens.OrderHistoryScreen.name)
+                },
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Card(
@@ -150,15 +150,16 @@ fun ProfileContent(navController: NavController = NavController(LocalContext.cur
                 }
                 Text(
                     text = "Previous Orders",
-                    modifier = Modifier.padding(start = 16.dp),
-                    style = MaterialTheme.typography.bodyLarge
+                    modifier = Modifier
+                        .padding(start = 16.dp)
+                        .weight(0.8f),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowRight,
+                    contentDescription = "Order history icon",
                 )
             }
         }
     }
-    /*TextButton(onClick = {
-        navController.navigate(ShoppingScreens.OrderHistoryScreen.name)
-    }) {
-        Text(text = "Order History")
-    }*/
 }

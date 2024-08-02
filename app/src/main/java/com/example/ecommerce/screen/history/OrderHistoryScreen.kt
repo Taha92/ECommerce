@@ -4,20 +4,26 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -57,6 +64,7 @@ fun OrderHistoryScreen(
         ShoppingAppBar(
             title = "History",
             icon = Icons.Default.ArrowBack,
+            showProfile = false,
             isMainScreen = false,
             navController = navController
         ) {
@@ -115,6 +123,7 @@ fun ExpandableCard(
                                 easing = LinearOutSlowInEasing
                             )
                         ),
+                    //colors = CardDefaults.cardColors(containerColor = Color.White),
                     //shape = shape,
                     onClick = {
                         expandedState = !expandedState
@@ -131,7 +140,8 @@ fun ExpandableCard(
                         ) {
                             Column(modifier = Modifier
                                 .fillMaxWidth()
-                                .weight(6f)) {
+                                .weight(6f)
+                            ) {
                                 Text(
                                     modifier = Modifier
                                         .padding(2.dp),
@@ -144,16 +154,18 @@ fun ExpandableCard(
                                 Text(modifier = Modifier
                                     .padding(2.dp),
                                     text = "Date: ${product.date}",
-                                    fontSize = 14.sp,
+                                    //fontSize = 14.sp,
                                     fontWeight = titleFontWeight,
+                                    style = MaterialTheme.typography.titleMedium,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
                                 Text(modifier = Modifier
                                     .padding(2.dp),
                                     text = "Total: ₺${product.totalBill}",
-                                    fontSize = 14.sp,
+                                    //fontSize = 14.sp,
                                     fontWeight = titleFontWeight,
+                                    style = MaterialTheme.typography.titleMedium,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
@@ -168,27 +180,36 @@ fun ExpandableCard(
                                 }) {
                                 Icon(
                                     imageVector = Icons.Default.ArrowDropDown,
-                                    contentDescription = "Drop-Down Arrow"
+                                    contentDescription = "Drop-Down Arrow",
+                                    tint = Color.Black,
                                 )
                             }
                         }
+
                         if (expandedState) {
                             for (item in product.products!!) {
 
-                                Divider()
+                                Divider(modifier = Modifier.padding(top = 8.dp))
 
                                 Row(modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(6.dp)
+                                    .padding(6.dp),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Image(
-                                        painter = rememberImagePainter(data = item.image),
-                                        contentDescription = "Product image",
-                                        modifier = Modifier
-                                            .width(96.dp)
-                                            .padding(end = 4.dp),
-                                        contentScale = ContentScale.Crop
-                                    )
+                                    Card(
+                                        shape = RoundedCornerShape(9.dp),
+                                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                                        border = BorderStroke(2.dp, color = Color.LightGray)
+                                    ) {
+                                        Image(
+                                            painter = rememberImagePainter(data = item.image),
+                                            contentDescription = "Product image",
+                                            modifier = Modifier
+                                                .width(96.dp)
+                                                .heightIn(100.dp)
+                                                .padding(end = 4.dp),
+                                        )
+                                    }
 
                                     Column(modifier = Modifier
                                         .padding(start = 16.dp, top = 6.dp)
