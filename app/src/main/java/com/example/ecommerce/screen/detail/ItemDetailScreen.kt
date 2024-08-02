@@ -32,7 +32,10 @@ import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.ecommerce.component.RoundedButton
 import com.example.ecommerce.component.ShoppingAppBar
+import com.example.ecommerce.component.performDatabaseOperation
+import com.example.ecommerce.model.Product
 import com.example.ecommerce.model.ProductXX
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun ItemDetailScreen(
@@ -43,6 +46,7 @@ fun ItemDetailScreen(
         ShoppingAppBar(
             title = "Product Detail",
             icon = Icons.Default.ArrowBack,
+            showProfile = false,
             isMainScreen = false,
             navController = navController
         ) {
@@ -65,6 +69,8 @@ fun ItemDetailContent(product: ProductXX) {
     Column(modifier = Modifier
         .fillMaxSize()
     ) {
+        val context = LocalContext.current
+
         Box(modifier = Modifier.weight(0.8f)) {
             Card(
                 shape = RoundedCornerShape(9.dp),
@@ -110,7 +116,19 @@ fun ItemDetailContent(product: ProductXX) {
         }
 
         Box(modifier = Modifier.weight(0.1f)) {
-            RoundedButton(label = "Add to Cart")
+            RoundedButton(label = "Add to Cart") {
+                //Save product to firestore
+                val mProduct = Product(
+                    name = product.name,
+                    shortDescription = product.shortDescription,
+                    price = product.priceText,
+                    priceWithDecimal = product.price,
+                    image = product.thumbnailURL,
+                    quantity = "1",
+                    userId = FirebaseAuth.getInstance().currentUser?.uid.toString()
+                )
+                performDatabaseOperation(mProduct, "Add", context)
+            }
         }
     }
 }

@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -35,6 +33,7 @@ import com.example.ecommerce.model.OrderHistoryItem
 import com.example.ecommerce.model.Product
 import com.example.ecommerce.navigation.ShoppingScreens
 import com.example.ecommerce.screen.cart.CartScreenViewModel
+import com.example.ecommerce.util.Constants
 import com.example.paymentsdk.Payment
 import com.example.paymentsdk.PaymentCallback
 import com.example.paymentsdk.PaymentInterface
@@ -48,7 +47,6 @@ import java.util.Date
 fun OtpScreen(navController: NavHostController, totalBill: String, cartViewModel: CartScreenViewModel) {
     Scaffold(topBar = {
         ShoppingAppBar(title = "Payment",
-            icon = Icons.Default.ArrowBack, // need to remove this
             isMainScreen = false,
             showProfile = false,
             navController = navController
@@ -167,7 +165,7 @@ fun PaymentContent(navController: NavController, totalBill: String, viewModel: C
 
 fun saveOrderHistoryInDatabase(item: OrderHistoryItem) {
     val db = FirebaseFirestore.getInstance()
-    val dbCollection = db.collection("order_history")
+    val dbCollection = db.collection(Constants.ORDER_HISTORY)
 
     if (item.toString().isNotEmpty()) {
         dbCollection.add(item)

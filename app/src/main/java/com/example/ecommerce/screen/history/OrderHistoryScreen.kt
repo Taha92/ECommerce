@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -35,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -93,14 +95,7 @@ fun ExpandableCard(
 ) {
     val listOfOrders: List<OrderHistoryItem>
 
-    // Card components to be
-    var expandedState by remember {
-        mutableStateOf(false)
-    }
-
-    val rotationState by animateFloatAsState(
-        targetValue = if (expandedState) 180f else 0f
-    )
+    val expandedStates = remember { mutableStateOf(mutableMapOf<Int, Boolean>()) }
 
     if (viewModel.data.value.loading!!) {
         Column(modifier = Modifier
@@ -118,20 +113,27 @@ fun ExpandableCard(
         listOfOrders = viewModel.data.value.data!!
 
         LazyColumn {
-            items(items = listOfOrders) { product ->
+            itemsIndexed(items = listOfOrders) { index, product ->
+                val expandedState = expandedStates.value.getOrElse(index) { false }
+                val rotationState by animateFloatAsState(
+                    targetValue = if (expandedState) 180f else 0f
+                )
+
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(bottom = 8.dp)
                         .animateContentSize(
                             animationSpec = tween(
                                 durationMillis = 300,
                                 easing = LinearOutSlowInEasing
                             )
                         ),
-                    //colors = CardDefaults.cardColors(containerColor = Color.White),
-                    //shape = shape,
                     onClick = {
-                        expandedState = !expandedState
+                        // Update expanded state for the clicked card
+                        expandedStates.value = expandedStates.value.toMutableMap().apply {
+                            this[index] = !expandedState
+                        }
                     }
                 ) {
                     // card content
@@ -181,7 +183,10 @@ fun ExpandableCard(
                                     .alpha(0.2f)
                                     .rotate(rotationState),
                                 onClick = {
-                                    expandedState = !expandedState
+                                    // Update expanded state for the clicked card
+                                    expandedStates.value = expandedStates.value.toMutableMap().apply {
+                                        this[index] = !expandedState
+                                    }
                                 }) {
                                 Icon(
                                     imageVector = Icons.Default.ArrowDropDown,

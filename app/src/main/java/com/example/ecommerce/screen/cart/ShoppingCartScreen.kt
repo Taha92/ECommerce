@@ -141,7 +141,6 @@ fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
             Box(modifier = Modifier.weight(0.1f)) {
                 RoundedButton {
                     navController.navigate(ShoppingScreens.CardDetailScreen.name + "/${totalPrice}")
-                    //navController.navigate(ShoppingScreens.CheckoutScreen.name + "/${totalPrice}")
                 }
             }
         }

@@ -22,13 +22,13 @@ object AppModule {
     @Provides
     fun provideFireBookRepository()
             = FireRepository(queryProduct = FirebaseFirestore.getInstance()
-        .collection("products"))
+        .collection(Constants.CART_PRODUCTS))
 
     @Singleton
     @Provides
     fun provideHistoryRepository()
             = HistoryRepository(queryHistory = FirebaseFirestore.getInstance()
-        .collection("order_history"))
+        .collection(Constants.ORDER_HISTORY))
 
     @Singleton
     @Provides

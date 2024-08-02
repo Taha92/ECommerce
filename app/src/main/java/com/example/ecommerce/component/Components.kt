@@ -68,6 +68,7 @@ import com.example.ecommerce.R
 import com.example.ecommerce.model.Product
 import com.example.ecommerce.navigation.ShoppingScreens
 import com.example.ecommerce.screen.home.HomeScreenViewModel
+import com.example.ecommerce.util.Constants
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QueryDocumentSnapshot
@@ -503,7 +504,7 @@ private fun CharView(
 fun performDatabaseOperation(product: Product, operation: String, context: Context) {
 
     val db = FirebaseFirestore.getInstance()
-    val dbCollection = db.collection("products")
+    val dbCollection = db.collection(Constants.CART_PRODUCTS)
     val query = dbCollection.whereEqualTo("name", product.name.toString())
 
     query.get().addOnSuccessListener { snapshot ->
@@ -580,7 +581,7 @@ fun updateProductInDatabase(
 
 fun deleteProductFromDatabase(product: Product) {
     FirebaseFirestore.getInstance()
-        .collection("products")
+        .collection(Constants.CART_PRODUCTS)
         .document(product.id!!)
         .delete()
         .addOnCompleteListener {

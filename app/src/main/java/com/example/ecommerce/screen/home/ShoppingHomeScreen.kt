@@ -145,7 +145,7 @@ private fun ProductsGridView(product: ProductXX, navController: NavController) {
                 Text(
                     text = product.name,
                     maxLines = 3,
-                    overflow = TextOverflow.Clip,
+                    overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .padding(4.dp)

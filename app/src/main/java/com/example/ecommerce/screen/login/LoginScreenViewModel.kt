@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ecommerce.model.User
+import com.example.ecommerce.util.Constants
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -72,7 +73,7 @@ class LoginScreenViewModel: ViewModel() {
         ).toMap()
 
 
-        FirebaseFirestore.getInstance().collection("users")
+        FirebaseFirestore.getInstance().collection(Constants.USERS)
             .add(user)
     }
 }
