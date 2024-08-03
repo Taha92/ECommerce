@@ -60,6 +60,7 @@ import com.example.ecommerce.component.deleteProductFromDatabase
 import com.example.ecommerce.component.performDatabaseOperation
 import com.example.ecommerce.model.Product
 import com.example.ecommerce.navigation.ShoppingScreens
+import com.google.gson.Gson
 
 @Composable
 fun ShoppingCartScreen(
@@ -126,7 +127,8 @@ fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
                             ) {
                                 ProductRow(
                                     product,
-                                    deletedItem
+                                    deletedItem,
+                                    navController
                                 ) { updatedProducts ->
                                     listOfProducts = updatedProducts
                                     totalPrice = updatedProducts.filter { !deletedItem.contains(it) }
@@ -169,6 +171,7 @@ fun NoItemInCart() {
 fun ProductRow(
     product: Product,
     deletedItem: SnapshotStateList<Product>,
+    navController: NavController,
     onProductListUpdated: (List<Product>) -> Unit
 ) {
     val context = LocalContext.current
@@ -182,7 +185,10 @@ fun ProductRow(
             .padding(4.dp)
             .fillMaxWidth()
             .height(140.dp)
-            .clickable { }
+            /*.clickable {
+                val selectedProductJson = Gson().toJson(product)
+                navController.navigate(ShoppingScreens.ItemDetailScreen.name + "?selectedProduct=${selectedProductJson}")
+            }*/
     ) {
         Row(modifier = Modifier
             .fillMaxWidth()

@@ -1,6 +1,5 @@
 package com.example.ecommerce.repository
 
-import android.util.Log
 import com.example.ecommerce.model.ProductXX
 import com.example.ecommerce.network.ProductsApi
 import com.example.jetareader.data.Resource
