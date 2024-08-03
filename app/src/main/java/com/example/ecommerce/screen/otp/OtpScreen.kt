@@ -1,5 +1,6 @@
 package com.example.ecommerce.screen.otp
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -65,18 +66,33 @@ fun OtpScreen(navController: NavHostController, totalBill: String, cartViewModel
             .fillMaxSize()
         ) {
             //payment content
-            PaymentContent(navController, totalBill, cartViewModel) { loading = true }
+            if (loading) {
+                Column(modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator()
+                    Text(text = "Loading...")
+                }
+            } else {
+                PaymentContent(navController, totalBill, cartViewModel) { loading = true }
+            }
         }
     }
 }
 
+@SuppressLint("SimpleDateFormat")
 @Composable
-fun PaymentContent(navController: NavController, totalBill: String, viewModel: CartScreenViewModel, onLoadingChanged: (Boolean) -> Unit) {
+fun PaymentContent(
+    navController: NavController,
+    totalBill: String,
+    viewModel: CartScreenViewModel,
+    onLoadingChanged: (Boolean) -> Unit
+) {
     var listOfProducts: List<Product> = emptyList()
     val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm:ss z")
     val currentDateAndTime = sdf.format(Date())
     var otpValue by remember { mutableStateOf("") }
-    //var loading by remember { mutableStateOf(false) }
     val context = LocalContext.current
     var orderId = 0
 
@@ -124,14 +140,12 @@ fun PaymentContent(navController: NavController, totalBill: String, viewModel: C
             ) {
                 //show loader first
                 onLoadingChanged(true)
-                //loading = true
 
                 // Confirm payment
                 paymentSDK.confirmPayment(otpValue, object : PaymentCallback {
                     override fun onSuccess(message: String?) {
                         // Handle success
                         onLoadingChanged(false)
-                        //loading = false
                         Log.d("confirmPayment", message!!)
                         val products = OrderHistoryItem(
                             orderId = orderId.toString(),
@@ -149,13 +163,16 @@ fun PaymentContent(navController: NavController, totalBill: String, viewModel: C
                         }
 
                         //Go to order placed screen
-                        navController.navigate(ShoppingScreens.OrderPlacedScreen.name)
+                        navController.navigate(ShoppingScreens.OrderPlacedScreen.name) {
+                            popUpTo(ShoppingScreens.OrderPlacedScreen.name) {
+                                inclusive = true
+                            }
+                        }
                     }
 
                     override fun onFailure(error: String?) {
                         // Handle failure
                         onLoadingChanged(false)
-                        //loading = false
                         Toast.makeText(context, error.toString(), Toast.LENGTH_SHORT).show()
                         Log.e("confirmPayment", error!!)
                     }

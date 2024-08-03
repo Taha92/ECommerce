@@ -1,5 +1,6 @@
 package com.example.ecommerce.screen.history
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -50,6 +51,8 @@ import coil.compose.rememberImagePainter
 import com.example.ecommerce.component.ShoppingAppBar
 import com.example.ecommerce.model.OrderHistoryItem
 import com.google.firebase.auth.FirebaseAuth
+import java.text.SimpleDateFormat
+import java.util.Date
 
 @Composable
 fun OrderHistoryScreen(
@@ -161,7 +164,7 @@ fun ExpandableCard(
                                     )
                                     Text(modifier = Modifier
                                         .padding(2.dp),
-                                        text = "Date: ${product.date}",
+                                        text = "Date: ${formatDate(product.date.toString())}",
                                         //fontSize = 14.sp,
                                         fontWeight = titleFontWeight,
                                         style = MaterialTheme.typography.titleMedium,
@@ -265,4 +268,19 @@ fun NoPreviousOrder() {
     ) {
         Text(text = "No previous orders...")
     }
+}
+
+@SuppressLint("SimpleDateFormat")
+fun formatDate(timestamp: String): String {
+    // Define the input date format
+    val inputFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss z")
+
+    // Parse the timestamp to a Date object
+    val date: Date = inputFormat.parse(timestamp) ?: return ""
+
+    // Define the output date format (only date)
+    val outputFormat = SimpleDateFormat("dd/MM/yyyy")
+
+    // Format the Date object to the desired output format
+    return outputFormat.format(date)
 }
