@@ -138,23 +138,30 @@ fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
                 }
             }
 
-            Box(modifier = Modifier
-                .weight(0.1f)
-            ) {
-                RoundedSubmitButton {
-                    navController.navigate(ShoppingScreens.CardDetailScreen.name + "/${totalPrice}")
+            if (listOfProducts.any { !deletedItem.contains(it) }) {
+                Box(modifier = Modifier.weight(0.1f)) {
+                    RoundedSubmitButton {
+                        navController.navigate(ShoppingScreens.CardDetailScreen.name + "/${totalPrice}")
+                    }
                 }
+            } else {
+                NoItemInCart()
             }
         }
 
     } else {
-        Column(modifier = Modifier
-            .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "No item in cart...")
-        }
+        NoItemInCart()
+    }
+}
+
+@Composable
+fun NoItemInCart() {
+    Column(modifier = Modifier
+        .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "No item in cart...")
     }
 }
 
