@@ -96,6 +96,7 @@ fun ItemDetailContent(product: ProductXX) {
                     Text(
                         text = "₺${product.price}",
                         textAlign = TextAlign.Center,
+                        color = Color.Black,
                         fontSize = 24.sp
                     )
                     Text(
@@ -104,6 +105,7 @@ fun ItemDetailContent(product: ProductXX) {
                         overflow = TextOverflow.Ellipsis,
                         textAlign = TextAlign.Center,
                         fontSize = 26.sp,
+                        color = Color.Black,
                         modifier = Modifier
                             .padding(4.dp)
                             .weight(0.3f)

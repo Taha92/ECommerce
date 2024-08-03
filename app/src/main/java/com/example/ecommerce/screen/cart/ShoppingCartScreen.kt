@@ -207,6 +207,7 @@ fun ProductRow(
                     text = "${product.name}",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    color = Color.Black,
                     modifier = Modifier
                         .padding(start = 16.dp)
                 )
@@ -214,11 +215,13 @@ fun ProductRow(
                     text = if (product.shortDescription == null) "Description" else "${product.shortDescription}",
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    color = Color.Black,
                     modifier = Modifier
                         .padding(start = 16.dp)
                 )
                 Text(
                     text = "₺${product.priceWithDecimal}",
+                    color = Color.Black,
                     modifier = Modifier
                         .padding(start = 16.dp)
                 )
@@ -247,13 +250,15 @@ fun ProductRow(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_remove),
                             contentDescription = "Remove icon",
-                            modifier = Modifier.size(34.dp)
+                            modifier = Modifier.size(34.dp),
+                            tint = Color.Black
                         )
                     }
 
                     Text(
                         text = productQuantity.value.toString(),
                         style = MaterialTheme.typography.titleMedium,
+                        color = Color.Black,
                         modifier = Modifier
                             .padding(top = 16.dp)
                     )
@@ -271,7 +276,8 @@ fun ProductRow(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_add),
                             contentDescription = "Add icon",
-                            modifier = Modifier.size(34.dp)
+                            modifier = Modifier.size(34.dp),
+                            tint = Color.Black
                         )
                     }
                 }

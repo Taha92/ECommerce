@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -134,6 +135,7 @@ private fun ProductsGridView(product: ProductXX, navController: NavController) {
 
                 Text(
                     text = String.format("₺%.2f", product.price),
+                    color = Color.Black,
                     textAlign = TextAlign.Center
                 )
                 Text(
@@ -141,6 +143,7 @@ private fun ProductsGridView(product: ProductXX, navController: NavController) {
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center,
+                    color = Color.Black,
                     modifier = Modifier
                         .padding(4.dp)
                 )

@@ -87,6 +87,7 @@ fun ProfileContent(navController: NavController = NavController(LocalContext.cur
                     Icon(
                         imageVector = Icons.Sharp.Person,
                         contentDescription = "Person icon",
+                        tint = Color.Red.copy(alpha = 0.5f),
                         modifier = Modifier
                             .size(42.dp)
                     )
@@ -96,6 +97,7 @@ fun ProfileContent(navController: NavController = NavController(LocalContext.cur
                         currentUser?.email.toString()
                             .split("@")[0].uppercase(Locale.getDefault())}",
                     modifier = Modifier.padding(start = 16.dp),
+                    color = Color.Black,
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -115,6 +117,7 @@ fun ProfileContent(navController: NavController = NavController(LocalContext.cur
                     Icon(
                         imageVector = Icons.Default.MailOutline,
                         contentDescription = "Email icon",
+                        tint = Color.Red.copy(alpha = 0.5f),
                         modifier = Modifier
                             .size(42.dp)
                     )
@@ -122,6 +125,7 @@ fun ProfileContent(navController: NavController = NavController(LocalContext.cur
                 Text(
                     text = currentUser?.email.toString(),
                     modifier = Modifier.padding(start = 16.dp),
+                    color = Color.Black,
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -143,6 +147,7 @@ fun ProfileContent(navController: NavController = NavController(LocalContext.cur
                 ) {
                     Icon(
                         imageVector = Icons.Default.ShoppingCart,
+                        tint = Color.Red.copy(alpha = 0.5f),
                         contentDescription = "Order history icon",
                         modifier = Modifier
                             .size(42.dp)
@@ -153,11 +158,13 @@ fun ProfileContent(navController: NavController = NavController(LocalContext.cur
                     modifier = Modifier
                         .padding(start = 16.dp)
                         .weight(0.8f),
+                    color = Color.Black,
                     style = MaterialTheme.typography.bodyLarge,
                 )
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowRight,
                     contentDescription = "Order history icon",
+                    tint = Color.Black
                 )
             }
         }
