@@ -40,7 +40,7 @@ fun ShoppingSplashScreen(navController: NavController = NavController(LocalConte
         Image(
             painter = painterResource(id = R.mipmap.splash),
             contentDescription = "Splash icon",
-            contentScale = ContentScale.Fit,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxSize()
         )

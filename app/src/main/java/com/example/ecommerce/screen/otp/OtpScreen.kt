@@ -3,7 +3,6 @@ package com.example.ecommerce.screen.otp
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -32,6 +31,7 @@ import androidx.navigation.NavHostController
 import com.example.ecommerce.component.OtpTextField
 import com.example.ecommerce.component.ShoppingAppBar
 import com.example.ecommerce.component.deleteProductFromDatabase
+import com.example.ecommerce.component.getNextOrderId
 import com.example.ecommerce.model.OrderHistoryItem
 import com.example.ecommerce.model.Product
 import com.example.ecommerce.navigation.ShoppingScreens
@@ -48,6 +48,8 @@ import java.util.Date
 
 @Composable
 fun OtpScreen(navController: NavHostController, totalBill: String, cartViewModel: CartScreenViewModel) {
+    var loading by remember { mutableStateOf(false) }
+
     Scaffold(topBar = {
         ShoppingAppBar(title = "Payment",
             isMainScreen = false,
@@ -63,20 +65,20 @@ fun OtpScreen(navController: NavHostController, totalBill: String, cartViewModel
             .fillMaxSize()
         ) {
             //payment content
-            PaymentContent(navController, totalBill, cartViewModel)
+            PaymentContent(navController, totalBill, cartViewModel) { loading = true }
         }
     }
 }
 
 @Composable
-fun PaymentContent(navController: NavController, totalBill: String, viewModel: CartScreenViewModel) {
+fun PaymentContent(navController: NavController, totalBill: String, viewModel: CartScreenViewModel, onLoadingChanged: (Boolean) -> Unit) {
     var listOfProducts: List<Product> = emptyList()
-    val sdf = SimpleDateFormat("dd/MM/yyyy")
+    val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm:ss z")
     val currentDateAndTime = sdf.format(Date())
     var otpValue by remember { mutableStateOf("") }
-    val orderId by remember { mutableStateOf(0) }
-    var loading by remember { mutableStateOf(false) }
+    //var loading by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    var orderId = 0
 
     val paymentSDK: PaymentInterface = Payment()
 
@@ -84,7 +86,11 @@ fun PaymentContent(navController: NavController, totalBill: String, viewModel: C
         listOfProducts = viewModel.data.value.data!!.toList()
     }
 
-    if (loading) {
+    getNextOrderId { id ->
+        orderId = id!!.toInt() + 1
+    }
+
+    if (viewModel.data.value.loading!!) {
         Column(modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -117,16 +123,18 @@ fun PaymentContent(navController: NavController, totalBill: String, viewModel: C
                 }
             ) {
                 //show loader first
-                loading = true
+                onLoadingChanged(true)
+                //loading = true
 
                 // Confirm payment
                 paymentSDK.confirmPayment(otpValue, object : PaymentCallback {
                     override fun onSuccess(message: String?) {
                         // Handle success
-                        loading = false
+                        onLoadingChanged(false)
+                        //loading = false
                         Log.d("confirmPayment", message!!)
                         val products = OrderHistoryItem(
-                            orderId = (orderId+1).toString(),
+                            orderId = orderId.toString(),
                             userId = FirebaseAuth.getInstance().currentUser?.uid.toString(),
                             products = listOfProducts,
                             date = currentDateAndTime,
@@ -146,7 +154,8 @@ fun PaymentContent(navController: NavController, totalBill: String, viewModel: C
 
                     override fun onFailure(error: String?) {
                         // Handle failure
-                        loading = false
+                        onLoadingChanged(false)
+                        //loading = false
                         Toast.makeText(context, error.toString(), Toast.LENGTH_SHORT).show()
                         Log.e("confirmPayment", error!!)
                     }
@@ -193,4 +202,44 @@ fun saveOrderHistoryInDatabase(item: OrderHistoryItem) {
             }
     }
 }
+
+/*
+fun saveOrderHistoryInDatabase(item: OrderHistoryItem) {
+    val db = FirebaseFirestore.getInstance()
+    val dbCollection = db.collection(Constants.ORDER_HISTORY)
+
+    val orderId = item.orderId
+    val query = dbCollection.whereEqualTo("order_id", orderId)
+
+    query.get()
+        .addOnSuccessListener { querySnapshot ->
+            if (querySnapshot.isEmpty) {
+                dbCollection.add(item)
+                    .addOnSuccessListener { documentRef ->
+                        val docId = documentRef.id
+                        dbCollection.document(docId)
+                            .update("id", docId)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    Log.d("Success", "SaveToFirebase: Saved Successfully!")
+                                }
+                            }
+                            .addOnFailureListener {
+                                Log.d("Error", "Error updating doc")
+                            }
+                    }
+                    .addOnFailureListener {
+                        Log.d("Error", "Error adding document")
+                    }
+            } else {
+                // Document already exists
+                Log.d("Info", "Document with orderId $orderId already exists.")
+            }
+        }
+        .addOnFailureListener {
+            Log.d("Error", "Error querying Firestore")
+        }
+}
+*/
+
 

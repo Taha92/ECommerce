@@ -73,8 +73,7 @@ fun ShoppingCartScreen(
             icon = Icons.Default.ArrowBack,
             showProfile = false,
             isMainScreen = false,
-            navController = navController,
-            viewModel = viewModel
+            navController = navController
         ) {
             navController.popBackStack()
         }

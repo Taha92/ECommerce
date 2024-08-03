@@ -111,8 +111,10 @@ fun ExpandableCard(
         }
 
         if (listOfOrders.isNotEmpty()) {
-            LazyColumn {
-                itemsIndexed(items = listOfOrders) { index, product ->
+            LazyColumn(modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 35.dp)) {
+                itemsIndexed(items = listOfOrders.sortedByDescending { it.orderId }) { index, product ->
                     val expandedState = expandedStates.value.getOrElse(index) { false }
                     val rotationState by animateFloatAsState(
                         targetValue = if (expandedState) 180f else 0f

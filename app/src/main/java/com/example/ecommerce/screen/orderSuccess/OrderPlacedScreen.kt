@@ -106,7 +106,11 @@ fun OrderPlacedScreen(navController: NavController = NavController(LocalContext.
 
             Box(modifier = Modifier.weight(0.1f)) {
                 RoundedSubmitButton("Go To Home") {
-                    navController.navigate(ShoppingScreens.ShoppingHomeScreen.name)
+                    navController.navigate(ShoppingScreens.ShoppingHomeScreen.name) {
+                        popUpTo(ShoppingScreens.ShoppingHomeScreen.name) {
+                            inclusive = true
+                        }
+                    }
                 }
             }
         }

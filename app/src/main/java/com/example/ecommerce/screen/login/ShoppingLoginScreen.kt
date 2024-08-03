@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -54,7 +55,9 @@ fun ShoppingLoginScreen(navController: NavController,
         .fillMaxSize()
     ) {
         Column(modifier = Modifier
-            .padding(top = 16.dp),
+            .padding(top = 16.dp)
+            .verticalScroll(rememberScrollState())
+            .imePadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
@@ -62,35 +65,45 @@ fun ShoppingLoginScreen(navController: NavController,
             if (showLoginForm.value) {
                 UserForm(loading = false, isCreateAccount = false) { email, password ->
                     viewModel.signInWithEmailAndPassword(email, password, context) {
-                        navController.navigate(ShoppingScreens.ShoppingHomeScreen.name)
+                        navController.navigate(ShoppingScreens.ShoppingHomeScreen.name) {
+                            popUpTo(ShoppingScreens.ShoppingHomeScreen.name) {
+                                inclusive = true
+                            }
+                        }
                     }
                 }
             } else {
                 UserForm(loading = false, isCreateAccount = true) { email, password ->
                     viewModel.createUserWithEmailAndPassword(email, password) {
-                        navController.navigate(ShoppingScreens.ShoppingHomeScreen.name)
+                        navController.navigate(ShoppingScreens.ShoppingHomeScreen.name) {
+                            popUpTo(ShoppingScreens.ShoppingHomeScreen.name) {
+                                inclusive = true
+                            }
+                        }
                     }
                 }
             }
-        }
-        Spacer(modifier = Modifier.height(15.dp))
-        Row(modifier = Modifier
-            .padding(15.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val text = if (showLoginForm.value) "Sign Up" else "Login"
-            Text(text = "New User?")
-            Text(
-                text,
-                modifier = Modifier
-                    .clickable {
-                        showLoginForm.value = !showLoginForm.value
-                    }
-                    .padding(start = 5.dp),
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Row(modifier = Modifier
+                .padding(15.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val text = if (showLoginForm.value) "Sign Up" else "Login"
+                Text(text = "New User?")
+                Text(
+                    text,
+                    modifier = Modifier
+                        .clickable {
+                            showLoginForm.value = !showLoginForm.value
+                        }
+                        .padding(start = 5.dp),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
         }
     }
 }

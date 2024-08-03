@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -31,11 +32,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -167,7 +164,7 @@ fun MonthDropDown(
                 onAction = KeyboardActions {
                     //passwordFocusRequest.requestFocus()
                 })
-            
+
             ExposedDropdownMenu(expanded = isExpanded.value, onDismissRequest = { isExpanded.value = false }) {
                 list.forEachIndexed { index, text ->
                     DropdownMenuItem(
@@ -233,7 +230,7 @@ fun YearDropDown(
                 onAction = KeyboardActions {
                     if (!valid) return@KeyboardActions
                 })
-            
+
 
             ExposedDropdownMenu(expanded = isExpanded.value, onDismissRequest = { isExpanded.value = false }) {
                 list.forEachIndexed { index, text ->
@@ -293,71 +290,71 @@ fun CardDetailsContent(
                 cardCvv.value.trim().isNotEmpty()) && termsAndCondition.value
     }
 
-
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(4.dp)
-        .verticalScroll(rememberScrollState())
+    // Wrap content with a Column and apply imePadding to accommodate the keyboard
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(4.dp)
+            .verticalScroll(rememberScrollState())
+            .imePadding() // Add padding to handle keyboard visibility
     ) {
-        Column(modifier = Modifier.weight(0.8f)) {
-            HeaderDescription()
+        HeaderDescription()
 
-            CardHolderNameInput(
-                nameState = cardHolderName,
-                enabled = !loading,
-                onAction = KeyboardActions {
-                    cardNumberFocusRequest.requestFocus()
-                })
+        CardHolderNameInput(
+            nameState = cardHolderName,
+            enabled = !loading,
+            onAction = KeyboardActions {
+                cardNumberFocusRequest.requestFocus()
+            })
 
-            CardNumberInput(
-                numberState = cardNumber,
-                enabled = !loading,
-                onAction = KeyboardActions {
-                    //passwordFocusRequest.requestFocus()
-                })
+        CardNumberInput(
+            numberState = cardNumber,
+            enabled = !loading,
+            onAction = KeyboardActions {
+                //passwordFocusRequest.requestFocus()
+            })
 
-            Row(modifier = Modifier.height(80.dp)) {
-                Box(modifier = Modifier.weight(0.5f)) {
-                    MonthDropDown(cardMonthExpiry)
-                }
-                Box(modifier = Modifier.weight(0.5f)) {
-                    YearDropDown(cardYearExpiry, valid)
-                }
+        Row(modifier = Modifier.height(80.dp)) {
+            Box(modifier = Modifier.weight(0.5f)) {
+                MonthDropDown(cardMonthExpiry)
             }
-
-            CardCVVInput(
-                numberState = cardCvv,
-                enabled = !loading,
-                onAction = KeyboardActions {
-                    //passwordFocusRequest.requestFocus()
-                })
-
-            TermsAndCondition(termsAndCondition)
-
-            Row(modifier = Modifier
-                .padding(start = 16.dp, top = 6.dp, bottom = 6.dp)
-            ){
-                Image(
-                    painter = painterResource(id = R.mipmap.master_card),
-                    contentDescription = "Master card icon",
-                    modifier = Modifier
-                        .size(42.dp)
-                )
-                Image(
-                    painter = painterResource(id = R.mipmap.visa_card),
-                    contentDescription = "Visa card icon",
-                    modifier = Modifier
-                        .size(42.dp)
-                        .padding(start = 6.dp)
-                )
-                Image(
-                    painter = painterResource(id = R.mipmap.american_express_card),
-                    contentDescription = "American express card icon",
-                    modifier = Modifier
-                        .size(42.dp)
-                        .padding(start = 6.dp)
-                )
+            Box(modifier = Modifier.weight(0.5f)) {
+                YearDropDown(cardYearExpiry, valid)
             }
+        }
+
+        CardCVVInput(
+            numberState = cardCvv,
+            enabled = !loading,
+            onAction = KeyboardActions {
+                //passwordFocusRequest.requestFocus()
+            })
+
+        TermsAndCondition(termsAndCondition)
+
+        Row(modifier = Modifier
+            .padding(start = 16.dp, top = 6.dp, bottom = 6.dp)
+        ){
+            Image(
+                painter = painterResource(id = R.mipmap.master_card),
+                contentDescription = "Master card icon",
+                modifier = Modifier
+                    .size(42.dp)
+            )
+            Image(
+                painter = painterResource(id = R.mipmap.visa_card),
+                contentDescription = "Visa card icon",
+                modifier = Modifier
+                    .size(42.dp)
+                    .padding(start = 6.dp)
+            )
+            Image(
+                painter = painterResource(id = R.mipmap.american_express_card),
+                contentDescription = "American express card icon",
+                modifier = Modifier
+                    .size(42.dp)
+                    .padding(start = 6.dp)
+            )
         }
 
         val cardInfo = CardInfo(
@@ -369,7 +366,11 @@ fun CardDetailsContent(
         )
         val cardInfoJson = Gson().toJson(cardInfo)
 
-        Box(modifier = Modifier.weight(0.1f)) {
+        Box(modifier = Modifier
+            .padding(4.dp)
+            .fillMaxWidth()
+            .height(80.dp) // Adjust height as needed
+        ) {
             SubmitButton(
                 loading = loading,
                 validInputs = valid,
@@ -377,7 +378,6 @@ fun CardDetailsContent(
                 navController = navController,
                 cardInfoJson = cardInfoJson
             ) {
-                //onDone(email.value.trim(), password.value.trim())
                 keyboardController?.hide()
             }
         }
