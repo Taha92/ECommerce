@@ -76,7 +76,7 @@ fun ItemDetailContent(product: ProductXX) {
                 modifier = Modifier
                     .padding(4.dp)
                     .fillMaxWidth()
-                    .height(406.dp)
+                    .height(400.dp)
             ) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -101,7 +101,7 @@ fun ItemDetailContent(product: ProductXX) {
                     Text(
                         text = product.name,
                         maxLines = 3,
-                        overflow = TextOverflow.Clip,
+                        overflow = TextOverflow.Ellipsis,
                         textAlign = TextAlign.Center,
                         fontSize = 26.sp,
                         modifier = Modifier

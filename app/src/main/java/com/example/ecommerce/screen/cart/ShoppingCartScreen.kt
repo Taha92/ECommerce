@@ -128,7 +128,6 @@ fun CartContent(navController: NavController, viewModel: CartScreenViewModel) {
                                 ProductRow(
                                     product,
                                     deletedItem,
-                                    navController
                                 ) { updatedProducts ->
                                     listOfProducts = updatedProducts
                                     totalPrice = updatedProducts.filter { !deletedItem.contains(it) }
@@ -171,7 +170,6 @@ fun NoItemInCart() {
 fun ProductRow(
     product: Product,
     deletedItem: SnapshotStateList<Product>,
-    navController: NavController,
     onProductListUpdated: (List<Product>) -> Unit
 ) {
     val context = LocalContext.current
@@ -185,10 +183,6 @@ fun ProductRow(
             .padding(4.dp)
             .fillMaxWidth()
             .height(140.dp)
-            /*.clickable {
-                val selectedProductJson = Gson().toJson(product)
-                navController.navigate(ShoppingScreens.ItemDetailScreen.name + "?selectedProduct=${selectedProductJson}")
-            }*/
     ) {
         Row(modifier = Modifier
             .fillMaxWidth()
