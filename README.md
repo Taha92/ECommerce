@@ -26,7 +26,12 @@ The backend integration with Firestore and Firebase handles user authentication 
     <td align="center"><img src="screenshots/cart.jpeg" alt="screenshot 6" width="200"></td>
   </tr>
    <tr>
-    <td align="center"><img src="screenshots/confirm.jpeg" alt="screenshot 7" width="200"></td>
+    <td align="center"><img src="screenshots/card.jpeg" alt="screenshot 7" width="200"></td>
+    <td align="center"><img src="screenshots/otp.jpeg" alt="screenshot 8" width="200"></td>
+    <td align="center"><img src="screenshots/checkout.jpeg" alt="screenshot 9" width="200"></td>
+  </tr>
+<tr>
+    <td align="center"><img src="screenshots/confirm.jpeg" alt="screenshot 10" width="200"></td>
   </tr>
 
 </table>
